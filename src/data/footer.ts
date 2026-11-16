@@ -53,7 +53,6 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       { label: 'About', href: '/about' },
       { label: 'Careers', href: '/careers' },
       { label: 'Trust Center', href: '/privacy' },
-      { label: 'Lab', href: '/lab' },
       { label: 'Become an affiliate', href: '/about' },
       { label: 'Media Kit', href: '/media-kit' },
     ],

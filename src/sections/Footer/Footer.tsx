@@ -82,21 +82,36 @@ export const Footer: React.FC<FooterProps> = () => {
         {/* 4-Column Footer Navigation Links */}
         <div
           ref={colsRef}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 pb-10 sm:pb-14"
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 pb-12 sm:pb-16"
         >
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} data-footer-col>
-              <ul className="space-y-2">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <AppLink
-                      to={link.href}
-                      className="text-[13px] font-medium text-[#1a1a1a]/90 hover:text-[#034f46] transition-colors"
-                    >
-                      {link.label}
-                    </AppLink>
-                  </li>
-                ))}
+              <h4 className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.14em] text-[#787D6D] font-semibold mb-4 sm:mb-5">
+                {col.heading}
+              </h4>
+              <ul className="space-y-2 sm:space-y-2.5">
+                {col.links.map((link) => {
+                  const isPricing = link.label === 'Pricing';
+                  return (
+                    <li key={link.label}>
+                      <AppLink
+                        to={link.href}
+                        className={`group inline-flex items-center gap-1.5 text-[13px] sm:text-[14px] font-normal transition-all duration-200 ${
+                          isPricing
+                            ? 'text-[#008272] hover:text-[#065B50] font-medium'
+                            : 'text-[#1A1A1A]/85 hover:text-[#034F46] hover:translate-x-0.5'
+                        }`}
+                      >
+                        <span>{link.label}</span>
+                        {isPricing && (
+                          <span className="inline-block transition-transform duration-200 group-hover:translate-x-1 font-sans">
+                            →
+                          </span>
+                        )}
+                      </AppLink>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

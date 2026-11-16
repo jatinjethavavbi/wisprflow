@@ -4,20 +4,23 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronRight,
+  ClipboardCheck,
   EyeOff,
   FileText,
   Lock,
   Mic,
+  Power,
   Search,
   Send,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   Users,
   X,
 } from 'lucide-react';
 import { Container } from '../components/Container';
 import { AppLink } from '../context/RouterContext';
-import { Testimonials } from '../sections/Testimonials/Testimonials';
+import { NotetakerTestimonials } from '../sections/Testimonials/NotetakerTestimonials';
 import {
   CONVERSATION_TRANSCRIPT,
   ENTERPRISE_CONTROLS,
@@ -52,6 +55,15 @@ import ipadSummaryImg from '../assets/images/ipad_summary_view.jpg';
 import workflowIconStarts from '../assets/images/workflow_icon_starts.png';
 import workflowIconWhatever from '../assets/images/workflow_icon_whatever.png';
 import workflowIconConnects from '../assets/images/workflow_icon_connects.png';
+import switchMigrationIllus from '../assets/images/switch_migration_illustration.png';
+import granolaGuideImg from '../assets/images/granola_alt_guide.png';
+import inPersonGuideImg from '../assets/images/in_person_guide.png';
+import zoomGuideImg from '../assets/images/zoom_nt_guide.png';
+import robSolomonAvatar from '../assets/images/rob_solomon_avatar.png';
+import sammYatesAvatar from '../assets/images/samm_yates_avatar.png';
+import ntCtaBg from '../assets/images/nt_cta_bg.webp';
+import flowbarGraphic from '../assets/images/flowbar_graphic.svg';
+import transcriptNewGraphic from '../assets/images/transcript_new_graphic.png';
 
 interface NotetakerPageProps {
   onOpenDownload: (mode?: 'dictation' | 'notetaker') => void;
@@ -121,7 +133,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
     'timelines' | 'decisions' | 'next-steps'
   >('timelines');
 
-  const [openFaqId, setOpenFaqId] = useState<string | null>(null);
+  const [activeFaqId, setActiveFaqId] = useState<string>('accuracy');
   const [activeGuide, setActiveGuide] = useState<NotetakerGuideArticle | null>(null);
 
   // Animation refs
@@ -1124,7 +1136,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                       transition={{ duration: 0.24 }}
                     >
                       <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                        Get the <em className="italic font-normal">details</em> right.
+                        Get the details right.
                       </h3>
                       <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
                         From uncommon names to industry jargon, Wispr&apos;s notetaking AI uses your dictionary and calendar to help capture the details that matter in your meeting transcript and summary.
@@ -1159,7 +1171,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                         Zoned out? <em className="italic font-normal">Catch up</em> in seconds.
                       </h3>
                       <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                        No more &quot;sorry, can you repeat that?&quot; Tap &quot;What did I miss?&quot; and Notetaker gives you a summary of the last five minutes. You&apos;re caught up before anyone notices.
+                        No more &quot;sorry, can you repeat that?&quot; Tap &quot;What did I miss?&quot; and Notetaker gives you a summary of the last few minutes. You&apos;re caught up before anyone notices.
                       </p>
                     </motion.div>
                   )}
@@ -1188,7 +1200,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                       transition={{ duration: 0.24 }}
                     >
                       <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                        Connect to <em className="italic font-normal">all</em> your AI tools.
+                        Connect to all your AI tools.
                       </h3>
                       <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
                         Bring your meeting history into Claude, ChatGPT, Gemini, or any tool that supports MCP. Put your meeting notes to work alongside your docs and projects. No copy-paste required.
@@ -1408,19 +1420,19 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
         </div>
       </section>
 
-      {/* 5. Three-Row Illustrated Workflow Section */}
-      <section className="py-16 sm:py-24 bg-[#ffffeb]">
+      {/* 5. Three-Column Illustrated Workflow Section matching screenshot */}
+      <section className="pt-24 sm:pt-32 pb-24 sm:pb-32 bg-[#ffffeb]">
         <Container>
-          <div ref={workflowRef} className="max-w-2xl mx-auto text-center mb-16 sm:mb-20">
+          <div ref={workflowRef} className="max-w-3xl mx-auto text-center mb-16 sm:mb-24">
             <p
               data-reveal-line
-              className="text-xs font-medium uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3"
+              className="text-xs font-semibold uppercase tracking-[0.16em] text-[#1a1a1a]/60 mb-5"
             >
               WISPR MAKES IT EASY
             </p>
             <h2
               data-reveal-line
-              className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] leading-[0.98] tracking-[-0.025em]"
+              className="font-display text-4xl sm:text-5xl lg:text-[4.25rem] leading-[1.02] tracking-[-0.025em] text-[#1a1a1a]"
               style={{ textWrap: 'balance' }}
             >
               Fits into your workflow.
@@ -1429,82 +1441,54 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </h2>
           </div>
 
-          <div className="max-w-xl mx-auto space-y-16 sm:space-y-20 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 max-w-6xl mx-auto text-center">
             {/* Workflow Item 1: Starts automatically */}
             <div className="flex flex-col items-center">
-              <div className="w-28 h-28 flex items-center justify-center mb-4">
-                <svg viewBox="0 0 120 120" className="w-24 h-24" fill="none" aria-hidden="true">
-                  <path
-                    d="M 32 30 A 42 42 0 0 1 94 34"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M 88 26 L 96 35 L 86 38"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M 88 90 A 42 42 0 0 1 26 86"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M 32 94 L 24 85 L 34 82"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="60" cy="60" r="22" fill="#ffa946" />
-                  <rect x="49" y="54" width="3" height="12" rx="1.5" fill="#1a1a1a" />
-                  <rect x="54.5" y="49" width="3" height="22" rx="1.5" fill="#1a1a1a" />
-                  <rect x="60" y="52" width="3" height="16" rx="1.5" fill="#1a1a1a" />
-                  <rect x="65.5" y="48" width="3" height="24" rx="1.5" fill="#1a1a1a" />
-                </svg>
+              <div className="h-24 flex items-center justify-center mb-6">
+                <img
+                  src={workflowIconStarts}
+                  alt="Starts automatically"
+                  className="h-20 w-auto object-contain"
+                />
               </div>
-              <h3 className="font-display text-2xl sm:text-[1.85rem] mb-1.5">Starts automatically</h3>
-              <p className="text-xs sm:text-sm text-[#1a1a1a]/70 max-w-md leading-relaxed">
+              <h3 className="font-display text-[1.65rem] lg:text-[1.85rem] font-normal leading-snug mb-3 text-[#1a1a1a]">
+                Starts automatically
+              </h3>
+              <p className="text-xs sm:text-[0.875rem] leading-[1.6] text-[#1a1a1a]/80 max-w-[280px] mx-auto">
                 One button joins and records. Catches back-to-backs and calls that aren&apos;t on your calendar.
               </p>
             </div>
 
             {/* Workflow Item 2: Whatever you use */}
             <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center gap-3 mb-4 relative">
-                <span className="w-11 h-11 rounded-xl bg-[#ffa946] text-[#1a1a1a] flex items-center justify-center shadow-xs -rotate-6">
-                  <Mic className="w-5 h-5" />
-                </span>
-                <span className="w-11 h-11 rounded-xl bg-[#d6ebff] text-[#1a1a1a] flex items-center justify-center shadow-xs">
-                  <Users className="w-5 h-5" />
-                </span>
-                <span className="w-11 h-11 rounded-xl bg-[#ffc8b8] text-[#1a1a1a] flex items-center justify-center shadow-xs rotate-6">
-                  <Sparkles className="w-5 h-5" />
-                </span>
+              <div className="h-24 flex items-center justify-center mb-6">
+                <img
+                  src={workflowIconWhatever}
+                  alt="Whatever you use"
+                  className="h-20 w-auto object-contain"
+                />
               </div>
-              <h3 className="font-display text-2xl sm:text-[1.85rem] mb-1.5">Whatever you use</h3>
-              <p className="text-xs sm:text-sm text-[#1a1a1a]/70 max-w-md leading-relaxed">
+              <h3 className="font-display text-[1.65rem] lg:text-[1.85rem] font-normal leading-snug mb-3 text-[#1a1a1a]">
+                Whatever you use
+              </h3>
+              <p className="text-xs sm:text-[0.875rem] leading-[1.6] text-[#1a1a1a]/80 max-w-[280px] mx-auto">
                 Google Meet, Teams, Huddles, lunch catchups. If words are being said, Notetaker captures them.
               </p>
             </div>
 
             {/* Workflow Item 3: Connects with your AI */}
             <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-14 h-12 rounded-xl bg-[#ffa946] text-[#1a1a1a] flex items-center justify-center shadow-xs">
-                  <FlowWaveformMark className="w-6 h-6" />
-                </div>
-                <ArrowRight className="w-5 h-5 text-[#1a1a1a]" />
-                <div className="w-14 h-12 rounded-xl bg-[#fde6b8] border border-[#1a1a1a]/15 text-[#1a1a1a] flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-5 h-5" />
-                </div>
+              <div className="h-24 flex items-center justify-center mb-6">
+                <img
+                  src={workflowIconConnects}
+                  alt="Connects with your AI"
+                  className="h-20 w-auto object-contain"
+                />
               </div>
-              <h3 className="font-display text-2xl sm:text-[1.85rem] mb-1.5">Connects with your AI</h3>
-              <p className="text-xs sm:text-sm text-[#1a1a1a]/70 max-w-md leading-relaxed">
+              <h3 className="font-display text-[1.65rem] lg:text-[1.85rem] font-normal leading-snug mb-3 text-[#1a1a1a]">
+                Connects with your AI
+              </h3>
+              <p className="text-xs sm:text-[0.875rem] leading-[1.6] text-[#1a1a1a]/80 max-w-[280px] mx-auto">
                 Notetaker plugs into Claude, ChatGPT, Gemini and any tool that speaks MCP.
               </p>
             </div>
@@ -1515,305 +1499,291 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       {/* 6. Granola / Otter Migration Card */}
       <section className="py-8 sm:py-14 bg-[#ffffeb]">
         <Container>
-          <div className="max-w-5xl mx-auto rounded-[2rem] bg-[#e2e2d2] p-7 sm:p-12 grid md:grid-cols-12 gap-8 items-center">
-            <div className="md:col-span-6 space-y-4">
-              <h2 className="font-display text-3xl sm:text-5xl leading-[0.98] tracking-[-0.02em]">
-                Switch without losing <em className="italic font-normal">a thing.</em>
+          <div className="max-w-6xl mx-auto rounded-[2rem] sm:rounded-[2.75rem] bg-[#E4E4D0] px-7 sm:px-12 py-9 sm:py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
+            {/* Left Column: Heading */}
+            <div className="lg:col-span-4">
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-[2.65rem] font-normal leading-[1.08] text-[#1a1a1a] tracking-[-0.015em]">
+                Switch without<br />
+                <em className="italic font-normal">losing a thing.</em>
               </h2>
-              <p className="text-xs sm:text-sm font-semibold text-[#1a1a1a]">
+            </div>
+
+            {/* Middle Column: Copy & CTA */}
+            <div className="lg:col-span-4 space-y-2.5 max-w-sm">
+              <h3 className="font-semibold text-sm sm:text-base text-[#1a1a1a] leading-snug">
                 Coming from Granola or Otter?
-              </p>
-              <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed max-w-md">
+              </h3>
+              <p className="text-xs sm:text-sm text-[#1a1a1a]/80 leading-relaxed">
                 Import your entire meeting history in a few easy steps. You&apos;ll see the source, meeting date, summary, and transcript.
               </p>
-              <div className="pt-1">
+              <div className="pt-3 sm:pt-4">
                 <AppLink
                   to="/get-started"
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:opacity-75 transition-opacity"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:underline underline-offset-4 transition-all group"
                 >
                   <span>Get started</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </AppLink>
               </div>
             </div>
 
-            <div className="md:col-span-6 flex items-center justify-center">
-              <svg
-                viewBox="0 0 360 220"
-                className="w-full max-w-[21rem]"
-                fill="none"
-                aria-hidden="true"
-              >
-                <defs>
-                  <clipPath id={`move-clip-${uid}`}>
-                    <rect x="0" y="0" width="360" height="220" rx="16" />
-                  </clipPath>
-                </defs>
-                <g clipPath={`url(#move-clip-${uid})`}>
-                  {/* Sheet 1 */}
-                  <g transform="translate(24, 24) rotate(-6)">
-                    <rect width="120" height="145" rx="10" fill="#ffffeb" stroke="#1a1a1a" strokeWidth="2.5" />
-                    <rect x="14" y="16" width="52" height="8" rx="3" fill="#03473e" />
-                    <rect x="14" y="34" width="90" height="5" rx="2.5" fill="#1a1a1a" fillOpacity="0.25" />
-                    <rect x="14" y="46" width="76" height="5" rx="2.5" fill="#1a1a1a" fillOpacity="0.25" />
-                    <rect x="14" y="58" width="84" height="5" rx="2.5" fill="#1a1a1a" fillOpacity="0.25" />
-                  </g>
-                  {/* Sheet 2 */}
-                  <g transform="translate(115, 16) rotate(4)">
-                    <rect width="120" height="145" rx="10" fill="#ffffeb" stroke="#1a1a1a" strokeWidth="2.5" />
-                    <rect x="14" y="16" width="56" height="8" rx="3" fill="#ffa946" />
-                    <rect x="14" y="34" width="90" height="5" rx="2.5" fill="#1a1a1a" fillOpacity="0.25" />
-                    <rect x="14" y="46" width="70" height="5" rx="2.5" fill="#1a1a1a" fillOpacity="0.25" />
-                    <rect x="14" y="58" width="82" height="5" rx="2.5" fill="#1a1a1a" fillOpacity="0.25" />
-                  </g>
-                  {/* Folder */}
-                  <path
-                    d="M 162 115 L 204 115 L 216 128 L 328 128 L 328 202 L 162 202 Z"
-                    fill="#34d399"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.5"
-                    strokeLinejoin="round"
-                  />
-                  <rect
-                    x="170"
-                    y="138"
-                    width="150"
-                    height="64"
-                    rx="10"
-                    fill="#f0d7ff"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.5"
-                  />
-                  <text
-                    x="245"
-                    y="177"
-                    textAnchor="middle"
-                    fill="#1a1a1a"
-                    fontSize="24"
-                    fontWeight="800"
-                    fontFamily="Figtree, sans-serif"
-                  >
-                    MOVE
-                  </text>
-                </g>
-              </svg>
+            {/* Right Column: Exact Illustration */}
+            <div className="lg:col-span-4 flex items-center justify-center lg:justify-end">
+              <img
+                src={switchMigrationIllus}
+                alt="Switch from Granola or Otter to Wispr Flow"
+                className="w-full max-w-[19rem] sm:max-w-[22rem] h-auto object-contain select-none pointer-events-none"
+                loading="lazy"
+              />
             </div>
           </div>
         </Container>
       </section>
 
       {/* 7. Enterprise Controls ("FOR BUSINESS") */}
-      <section className="py-16 sm:py-24 bg-[#ffffeb]">
+      <section className="py-20 sm:py-28 lg:py-32 bg-[#ffffeb]">
         <Container>
-          <div ref={enterpriseRef} className="max-w-4xl mx-auto">
-            <div className="mb-10 sm:mb-12">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3">
-                FOR BUSINESS
-              </p>
-              <h2
-                className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.025em] mb-4"
-                style={{ textWrap: 'balance' }}
-              >
-                Bring Notetaker to <em className="italic font-normal">your team.</em>
-              </h2>
-              <p className="text-sm sm:text-base text-[#1a1a1a]/75 max-w-lg leading-relaxed mb-4">
-                Help your team move work forward, with the controls your organization needs.
-              </p>
-              <AppLink
-                to="/privacy"
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:opacity-75 transition-opacity"
-              >
-                <span>Explore enterprise privacy controls</span>
-                <ChevronRight className="w-4 h-4" />
-              </AppLink>
+          <div ref={enterpriseRef} className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
+            {/* Left Column: Heading & CTA */}
+            <div className="lg:col-span-6 flex flex-col justify-between self-stretch">
+              <div>
+                <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-5 sm:mb-6">
+                  FOR BUSINESS
+                </p>
+                <h2 className="font-display text-4xl sm:text-6xl lg:text-[4.25rem] font-normal leading-[1.0] tracking-[-0.025em] text-[#1a1a1a] mb-6 sm:mb-7">
+                  Bring Notetaker<br />
+                  to <em className="italic font-normal">your team.</em>
+                </h2>
+                <p className="text-base sm:text-lg text-[#1a1a1a]/75 leading-relaxed max-w-md">
+                  Help your team move work forward, with the controls your organization needs.
+                </p>
+              </div>
+
+              <div className="pt-12 sm:pt-20 lg:pt-32">
+                <AppLink
+                  to="/privacy"
+                  className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold text-[#1a1a1a] hover:underline underline-offset-4 transition-all group"
+                >
+                  <span>Explore enterprise privacy controls</span>
+                  <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </AppLink>
+              </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
-              {ENTERPRISE_CONTROLS.map((item, idx) => {
-                const Icon =
-                  idx === 0 ? Users : idx === 1 ? ShieldCheck : idx === 2 ? EyeOff : Lock;
-                return (
-                  <div key={item.id} data-ent-item className="flex items-start gap-3.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#e4e4d0] text-[#1a1a1a] flex items-center justify-center shrink-0 mt-0.5">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm sm:text-base font-semibold text-[#1a1a1a] mb-1">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-[#1a1a1a]/70 leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
+            {/* Right Column: Stacked Controls List */}
+            <div className="lg:col-span-6 space-y-8 sm:space-y-10">
+              {/* Item 1: Control Notetaker access */}
+              <div data-ent-item>
+                <div className="flex items-center gap-3.5 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
+                    <SlidersHorizontal className="w-4 h-4" />
                   </div>
-                );
-              })}
-            </div>
+                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
+                    Control Notetaker access
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
+                  Turn Notetaker on or off across your organization.
+                </p>
+              </div>
 
-            <p className="text-[0.72rem] text-[#1a1a1a]/55 mt-8">
-              *Consent acknowledgment is available on request.
-            </p>
+              {/* Item 2: Optional consent acknowledgment */}
+              <div data-ent-item>
+                <div className="flex items-center gap-3.5 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
+                    <ClipboardCheck className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
+                    Optional consent acknowledgment
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
+                  Choose to require users to confirm they&apos;ve obtained participant consent before recording.
+                </p>
+              </div>
+
+              {/* Item 3: No training on your meeting data */}
+              <div data-ent-item>
+                <div className="flex items-center gap-3.5 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
+                    <Power className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
+                    No training on your meeting data
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
+                  Model training is disabled for every enterprise account.
+                </p>
+              </div>
+
+              {/* Item 4: Set privacy rules centrally */}
+              <div data-ent-item>
+                <div className="flex items-center gap-3.5 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
+                    Set privacy rules centrally
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
+                  Apply organization-level privacy restrictions that individual users can&apos;t change.
+                </p>
+              </div>
+
+              {/* Footnote */}
+              <p className="italic text-xs sm:text-sm text-[#1a1a1a]/55 pt-2">
+                *Consent acknowledgment is available on request.
+              </p>
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* 8. Shared Editorial Testimonials Section */}
-      <Testimonials />
+      {/* 8. Dedicated Notetaker Testimonials Section */}
+      <NotetakerTestimonials />
 
-      {/* 9. Notetaker FAQ Accordion */}
-      <section className="py-16 sm:py-24 bg-[#ffffeb]">
+      {/* 9. Notetaker FAQ Section - Split 2-Panel Master-Detail matching reference image */}
+      <section className="py-20 sm:py-28 bg-[#ffffeb]">
         <Container>
-          <div className="text-center mb-10 sm:mb-12">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3">
+          <div className="text-center mb-12 sm:mb-16">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3">
               FAQS
             </p>
-            <h2 className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.02em]">
+            <h2 className="font-display text-4xl sm:text-6xl lg:text-[4.25rem] font-normal leading-[1.0] tracking-[-0.02em] text-[#1a1a1a]">
               You might <em className="italic font-normal">be wondering.</em>
             </h2>
           </div>
 
-          <div className="max-w-5xl mx-auto rounded-[1.75rem] bg-[#03473e] text-[#ffffeb] p-6 sm:p-10 shadow-xl">
-            <h3 className="font-display text-2xl sm:text-[1.75rem] mb-6">Questions</h3>
-            <div className="divide-y divide-[#ffffeb]/12">
-              {NOTETAKER_FAQS.map((faq) => {
-                const isOpen = openFaqId === faq.id;
-                return (
-                  <div key={faq.id}>
-                    <button
-                      type="button"
-                      aria-expanded={isOpen}
-                      onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
-                      className="w-full py-4 flex items-center justify-between gap-4 text-left cursor-pointer group"
-                    >
-                      <span className="text-xs sm:text-sm font-medium text-[#ffffeb]/95 group-hover:text-[#ffffeb]">
-                        {faq.question}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 shrink-0 text-[#ffffeb]/75 transition-transform duration-200 ${
-                          isOpen ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </button>
+          <div className="max-w-6xl mx-auto rounded-[2.25rem] sm:rounded-[3rem] bg-[#E3E5D4] p-5 sm:p-8 lg:p-10 shadow-sm border border-black/5">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+              {/* Left Column: Questions List (Dark Green Box) */}
+              <div className="lg:col-span-5 rounded-[1.75rem] sm:rounded-[2rem] bg-[#06443B] p-5 sm:p-7 text-[#ffffeb] flex flex-col shadow-inner">
+                <h3 className="font-display text-2xl sm:text-[1.75rem] font-normal text-[#ffffeb] mb-5 shrink-0">
+                  Questions
+                </h3>
 
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.22 }}
-                          className="overflow-hidden"
-                        >
-                          <p className="pb-4 text-xs sm:text-sm text-[#ffffeb]/75 leading-relaxed max-w-3xl">
-                            {faq.answer}
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                <div className="space-y-2 overflow-y-auto max-h-[380px] sm:max-h-[440px] pr-1.5 custom-scrollbar">
+                  {NOTETAKER_FAQS.map((faq) => {
+                    const isSelected = activeFaqId === faq.id;
+                    return (
+                      <button
+                        key={faq.id}
+                        type="button"
+                        onClick={() => setActiveFaqId(faq.id)}
+                        className={`w-full text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer block ${
+                          isSelected
+                            ? 'bg-white/10 text-[#ffffeb] font-semibold shadow-sm'
+                            : 'text-[#ffffeb]/80 hover:text-[#ffffeb] hover:bg-white/5 font-medium'
+                        }`}
+                      >
+                        <span className="text-xs sm:text-[14px] leading-snug block">
+                          {faq.question}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right Column: Answer Panel */}
+              {(() => {
+                const activeFaq =
+                  NOTETAKER_FAQS.find((f) => f.id === activeFaqId) || NOTETAKER_FAQS[0];
+                return (
+                  <div className="lg:col-span-7 flex flex-col justify-start">
+                    <h3 className="font-display text-2xl sm:text-[1.75rem] font-normal text-[#1a1a1a] mb-2">
+                      Answer
+                    </h3>
+                    <p className="font-semibold text-xs sm:text-sm text-[#1a1a1a]/70 mb-3 line-clamp-1">
+                      {activeFaq.question}
+                    </p>
+
+                    <div className="rounded-2xl sm:rounded-3xl bg-[#ffffeb] p-6 sm:p-8 lg:p-9 shadow-sm border border-black/5 min-h-[340px] flex-1 flex flex-col justify-between">
+                      <div className="space-y-4 text-xs sm:text-sm md:text-[15px] leading-relaxed text-[#1a1a1a]/85 font-body">
+                        {activeFaq.answer.split('\n\n').map((paragraph, pIdx) => (
+                          <p key={pIdx}>{paragraph}</p>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 );
-              })}
+              })()}
             </div>
           </div>
         </Container>
       </section>
 
       {/* 10. Editorial Guides ("Level up your note taking.") */}
-      <section id="guides" className="py-16 sm:py-24 bg-[#ffffeb]">
+      <section id="guides" className="py-20 sm:py-28 lg:py-32 bg-[#EFECE6] text-[#141414]">
         <Container>
-          <div className="text-center mb-10 sm:mb-14">
-            <h2 className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.02em]">
-              Level <em className="italic font-normal">up</em> your note taking.
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.02] tracking-tight text-[#141414]">
+              <em className="italic font-normal">Level up</em> your note taking.
             </h2>
           </div>
 
-          <div ref={guidesRef} className="max-w-4xl mx-auto space-y-6">
+          <div
+            ref={guidesRef}
+            className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 max-w-6xl mx-auto"
+          >
             {NOTETAKER_GUIDES.map((guide) => {
-              const cardPhoto =
+              const guideImgs =
                 guide.variant === 'granola'
-                  ? clayImg
+                  ? { cover: granolaGuideImg, avatar: robSolomonAvatar }
                   : guide.variant === 'inperson'
-                  ? alexImg
-                  : stevenImg;
-              const authorAvatar =
-                guide.variant === 'granola'
-                  ? daveImg
-                  : guide.variant === 'inperson'
-                  ? alexImg
-                  : stevenImg;
+                  ? { cover: inPersonGuideImg, avatar: sammYatesAvatar }
+                  : { cover: zoomGuideImg, avatar: robSolomonAvatar };
 
               return (
                 <article
                   key={guide.id}
-                  className="rounded-[1.75rem] bg-[#e2e2d2] overflow-hidden border border-[#1a1a1a]/8 shadow-xs transition-transform duration-200 hover:-translate-y-0.5"
+                  className="group flex flex-col p-3 sm:p-4 rounded-[24px] sm:rounded-[28px] bg-[#FFFFEB]/0 hover:bg-[#FFFFEB] transition-all duration-200 ease-out hover:shadow-[0_12px_36px_rgba(0,0,0,0.06)] cursor-pointer"
                 >
                   <button
                     type="button"
                     onClick={() => setActiveGuide(guide)}
-                    className="w-full text-left cursor-pointer block"
+                    className="text-center w-full flex flex-col h-full cursor-pointer focus:outline-none"
                   >
-                    {/* Visual Banner */}
-                    <div className="relative h-56 sm:h-72 overflow-hidden bg-[#1a1a1a]">
+                    {/* Visual Thumbnail */}
+                    <div className="w-full aspect-[16/10] rounded-[16px] sm:rounded-[18px] overflow-hidden bg-black/5 relative mb-3.5">
                       <img
-                        src={cardPhoto}
+                        src={guideImgs.cover}
                         alt={guide.title}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover opacity-65"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
-
-                      {guide.variant === 'granola' && (
-                        <div className="absolute inset-0 flex items-center justify-center p-6">
-                          <div className="w-full max-w-md rounded-xl bg-[#ffffeb] text-[#1a1a1a] p-5 shadow-2xl">
-                            <div className="font-display text-2xl sm:text-3xl mb-3">
-                              Granola alternatives
-                            </div>
-                            <div className="space-y-2">
-                              <div className="h-2.5 w-3/4 rounded-full bg-[#1a1a1a]/15" />
-                              <div className="h-2.5 w-2/3 rounded-full bg-[#1a1a1a]/12" />
-                              <div className="h-2.5 w-1/2 rounded-full bg-[#1a1a1a]/10" />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {guide.variant === 'inperson' && (
-                        <div className="absolute inset-0 flex items-center justify-center p-6">
-                          <div className="rounded-xl bg-[#03473e] text-[#ffffeb] px-6 py-4 shadow-2xl border border-[#ffffeb]/15">
-                            <div className="font-display text-2xl sm:text-3xl">
-                              Less note-taking. More listening.
-                            </div>
-                            <div className="mt-2 w-7 h-7 rounded-md bg-[#ffffeb]/15 flex items-center justify-center">
-                              <FlowWaveformMark className="w-4 h-4 text-[#cef5ca]" />
-                            </div>
-                          </div>
-                        </div>
-                      )}
                     </div>
 
-                    {/* Clean Typography Body */}
-                    <div className="p-6 sm:p-8 text-center">
-                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-2">
+                    {/* Tag / Category Badge (Centered) */}
+                    <div className="mb-2.5">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] bg-[#E3DED5] text-[#3A3834] text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider">
                         {guide.category}
-                      </div>
-                      <h3 className="font-display text-2xl sm:text-3xl leading-tight mb-5">
-                        {guide.title}
-                      </h3>
+                      </span>
+                    </div>
 
-                      <div className="flex items-center justify-between text-xs text-[#1a1a1a]/65 pt-2">
-                        <div className="flex items-center gap-2.5">
-                          <img
-                            src={authorAvatar}
-                            alt={guide.author}
-                            referrerPolicy="no-referrer"
-                            className="w-6 h-6 rounded-full object-cover"
-                          />
-                          <span>
-                            {guide.author} · {guide.date}
-                          </span>
-                        </div>
-                        <span className="font-medium tracking-wider uppercase">{guide.readTime}</span>
+                    {/* Title (Centered) */}
+                    <h3 className="font-display text-lg sm:text-[1.25rem] lg:text-[1.32rem] leading-[1.28] font-normal text-[#141414] mb-5 text-center px-1 line-clamp-2 min-h-[3.2rem]">
+                      {guide.title}
+                    </h3>
+
+                    {/* Author & Read Time Footer */}
+                    <div className="flex items-center justify-between mt-auto pt-1 px-1 text-xs text-[#555] w-full">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={guideImgs.avatar}
+                          alt={guide.author}
+                          referrerPolicy="no-referrer"
+                          className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover shrink-0 ring-1 ring-black/10"
+                        />
+                        <span className="font-medium text-[#222]">{guide.author}</span>
+                        <span className="text-[#888]">•</span>
+                        <span className="text-[#666]">{guide.date}</span>
                       </div>
+                      <span className="px-2 py-0.5 rounded-[4px] bg-[#E3DED5]/85 text-[#555] font-mono text-[10px] sm:text-[11px] font-medium tracking-tight uppercase">
+                        {guide.readTime}
+                      </span>
                     </div>
                   </button>
                 </article>
@@ -1824,106 +1794,119 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       </section>
 
       {/* 11. Notetaker Final CTA */}
-      <section ref={finalCtaRef} className="pb-12 sm:pb-16 bg-[#ffffeb]">
-        <Container>
-          <div className="relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden min-h-[28rem] sm:min-h-[34rem] flex items-center justify-center text-center text-[#ffffeb] px-6 py-16">
+      <section ref={finalCtaRef} className="px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 bg-[#EFECE6]">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative rounded-[2.5rem] sm:rounded-[3.5rem] lg:rounded-[4.5rem] overflow-hidden min-h-[32rem] sm:min-h-[40rem] lg:min-h-[44rem] flex items-center justify-center text-center text-[#ffffeb] px-6 py-20 sm:py-28 shadow-[0_25px_60px_rgba(0,0,0,0.18)]">
             <img
-              src={atmosphereImg}
-              alt=""
+              src={ntCtaBg}
+              alt="Wispr Flow Notetaker CTA"
               referrerPolicy="no-referrer"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/45 via-[#1a1a1a]/55 to-[#1a1a1a]/75" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/35" />
 
-            <div className="relative z-10 max-w-2xl mx-auto">
+            <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
               <h2
-                className="font-display text-4xl sm:text-5xl lg:text-[4rem] leading-[0.96] tracking-[-0.025em] mb-4"
+                className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem] leading-[0.98] tracking-tight text-[#FFFFEB] mb-6"
                 style={{ textWrap: 'balance' }}
               >
-                Put your words to work in more ways <em className="italic font-normal">than one.</em>
+                Put your words to work <br className="hidden sm:inline" />
+                in more ways <em className="italic font-normal">than one.</em>
               </h2>
-              <p className="text-sm sm:text-base text-[#ffffeb]/85 max-w-md mx-auto leading-relaxed mb-7">
+
+              <p className="text-sm sm:text-base lg:text-lg text-[#FFFFEB]/85 max-w-xl mx-auto leading-relaxed mb-8 font-body">
                 Capture meeting notes with Notetaker and write emails, messages, and documents by speaking with Flow. Both in one subscription.
               </p>
 
               <button
                 type="button"
                 onClick={() => onOpenDownload('notetaker')}
-                className="inline-flex items-center justify-center gap-2.5 bg-[#f0d7ff] hover:bg-[#e7c4ff] border border-[#1a1a1a] rounded-[0.55rem] px-6 py-3.5 text-sm sm:text-base font-semibold text-[#1a1a1a] transition-transform duration-200 hover:-translate-y-0.5 cursor-pointer whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-2.5 bg-[#E4D1FF] hover:bg-[#D8BEFF] rounded-xl px-7 py-3.5 text-sm sm:text-base font-medium text-[#141414] transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shadow-md hover:shadow-lg whitespace-nowrap"
               >
                 <OsButtonIcon os={detectedOS} />
                 <span>
-                  {detectedOS === 'mac' ? 'Download for Mac' : 'Get started on Windows'}
+                  {detectedOS === 'mac' ? 'Get started on Mac' : 'Get started on Windows'}
                 </span>
               </button>
 
-              <div className="text-xs text-[#ffffeb]/70 mt-3.5">
+              <div className="text-xs sm:text-[13px] font-medium text-[#FFFFEB]/75 mt-4">
                 Available on Mac and Windows
               </div>
             </div>
           </div>
-        </Container>
+        </div>
       </section>
 
       {/* 12. Bottom Products Switcher Strip above Footer */}
-      <section className="pb-12 sm:pb-16 bg-[#ffffeb]">
+      <section className="pb-16 sm:pb-24 bg-[#EFECE6]">
         <Container>
-          <div className="max-w-5xl mx-auto">
-            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/55 mb-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] text-[#787D6D] font-semibold mb-4 px-1">
               PRODUCTS
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-2xl bg-[#e2e2d2]/80 p-6 flex flex-col justify-between gap-4 border border-[#1a1a1a]/8">
-                <div className="flex items-start gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-[#f0d7ff] text-[#1a1a1a] flex items-center justify-center shrink-0">
-                    <FlowWaveformMark className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-[#1a1a1a] mb-1">
-                      Wispr Flow Dictation
-                    </h3>
-                    <p className="text-xs text-[#1a1a1a]/70 leading-relaxed">
-                      The voice-to-text AI that turns speech into clear, polished writing in every app.
-                    </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              {/* Product 1: Wispr Flow Dictation */}
+              <div
+                onClick={() => onOpenDownload('dictation')}
+                className="group relative flex items-center gap-4 sm:gap-6 bg-[#DDD8CB] border-2 border-[#1a1a1a]/70 hover:border-[#1a1a1a] rounded-[20px] sm:rounded-[22px] p-2.5 sm:p-3 pr-6 sm:pr-8 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
+              >
+                {/* Graphic Box */}
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-[16px] sm:rounded-[18px] bg-[#EBDDFF] flex items-center justify-center shrink-0 p-3 shadow-inner">
+                  <img
+                    src={flowbarGraphic}
+                    alt="Wispr Flowbar"
+                    className="max-w-[7.5rem] sm:max-w-[8.25rem] w-full object-contain"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col justify-center py-1 flex-1">
+                  <h3 className="font-body font-semibold text-base sm:text-lg text-[#141414] mb-1.5">
+                    Wispr Flow Dictation
+                  </h3>
+                  <p className="text-xs sm:text-[13px] text-[#141414]/70 leading-relaxed mb-3.5 max-w-xs sm:max-w-sm">
+                    The voice-to-text AI that turns speech into clear, polished writing in every app.
+                  </p>
+                  <div className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-[#141414] group-hover:text-black transition-colors">
+                    <span>Download free</span>
+                    <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onOpenDownload('dictation')}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a1a1a] hover:opacity-75 transition-opacity w-fit cursor-pointer"
-                >
-                  <span>Download free</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
               </div>
 
-              <div className="rounded-2xl bg-[#e2e2d2]/80 p-6 flex flex-col justify-between gap-4 border border-[#1a1a1a]/8">
-                <div className="flex items-start gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-[#03473e] text-[#ffffeb] flex items-center justify-center shrink-0">
-                    <FlowWaveformMark className="w-5 h-5" />
+              {/* Product 2: Wispr Flow Notetaker */}
+              <div
+                onClick={() => onOpenDownload('notetaker')}
+                className="group relative flex items-center gap-4 sm:gap-6 bg-[#DDD8CB] border-2 border-transparent hover:border-[#1a1a1a] rounded-[20px] sm:rounded-[22px] p-2.5 sm:p-3 pr-6 sm:pr-8 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
+              >
+                {/* Graphic Box */}
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-[16px] sm:rounded-[18px] bg-[#06443B] flex items-end justify-center shrink-0 overflow-hidden shadow-inner pt-2">
+                  <img
+                    src={transcriptNewGraphic}
+                    alt="Wispr Flow Transcript"
+                    className="max-w-[6.75rem] sm:max-w-[7.5rem] w-full object-contain translate-y-1"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col justify-center py-1 flex-1">
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <h3 className="font-body font-semibold text-base sm:text-lg text-[#141414]">
+                      Wispr Flow Notetaker
+                    </h3>
+                    <span className="bg-[#F89C33] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs shrink-0 tracking-tight">
+                      New
+                    </span>
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-base font-semibold text-[#1a1a1a]">
-                        Wispr Flow Notetaker
-                      </h3>
-                      <span className="text-[0.68rem] font-semibold text-[#8a5300] bg-[#fde6b8] px-1.5 py-0.5 rounded">
-                        New
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#1a1a1a]/70 leading-relaxed">
-                      AI meeting notes accurate enough to act on. Works in all meetings.
-                    </p>
+                  <p className="text-xs sm:text-[13px] text-[#141414]/70 leading-relaxed mb-3.5 max-w-xs sm:max-w-sm">
+                    AI meeting notes accurate enough to act on. Works in all meetings.
+                  </p>
+                  <div className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-[#141414] group-hover:text-black transition-colors">
+                    <span>Download free</span>
+                    <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onOpenDownload('notetaker')}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a1a1a] hover:opacity-75 transition-opacity w-fit cursor-pointer"
-                >
-                  <span>Download free</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
               </div>
             </div>
           </div>
@@ -2001,6 +1984,36 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Fixed Floating Privacy / Access Button at Bottom Left matching video */}
+      <div className="fixed bottom-6 left-6 z-50 pointer-events-auto">
+        <button
+          type="button"
+          aria-label="Privacy & Preferences"
+          className="w-11 h-11 rounded-full bg-[#d8b4e2] text-white flex items-center justify-center shadow-[0_4px_18px_rgba(0,0,0,0.18)] hover:scale-108 hover:shadow-[0_6px_22px_rgba(0,0,0,0.24)] transition-all cursor-pointer"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="w-6 h-6 stroke-current fill-none stroke-[1.8]"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 1a10 10 0 0 0-1.8.16" />
+            <path d="M7.34 3.65a10 10 0 0 0-2.6 3.6" />
+            <path d="M4.1 11a10 10 0 0 0 .5 3.5" />
+            <path d="M6.2 18.2a10 10 0 0 0 4.1 2.4" />
+            <path d="M14 21.6a10 10 0 0 0 4.2-1.8" />
+            <path d="M20.5 15.5a10 10 0 0 0 .5-3.5" />
+            <path d="M19.7 7.5a10 10 0 0 0-2.3-3" />
+            <path d="M12 5a7 7 0 0 0-6.7 5.1" />
+            <path d="M5.5 13a7 7 0 0 0 1.2 3.8" />
+            <path d="M9.8 19a7 7 0 0 0 5.4-.5" />
+            <path d="M17.5 15a7 7 0 0 0 .5-3" />
+            <path d="M16.5 8a7 7 0 0 0-3.3-2.5" />
+            <path d="M12 9a3 3 0 0 0-3 3c0 2 1 3.5 3 3.5s3-1.5 3-3.5a3 3 0 0 0-3-3" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };

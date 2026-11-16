@@ -375,7 +375,7 @@ export const NOTETAKER_FAQS: NotetakerFaqItem[] = [
     id: 'accuracy',
     question: "How accurate are Wispr Notetaker's AI transcripts?",
     answer:
-      'Wispr Notetaker uses the same context-aware speech engine behind Flow Dictation, paired with your personal dictionary and calendar context. Uncommon teammate names, acronyms, and internal project codenames are transcribed accurately from day one.',
+      'Wispr Notetaker is built to spell names, jargon, and product terms correctly. Most AI notetakers transcribe your conversation cold. Notetaker starts with your context: the people on your calendar and the names and jargon in your personal dictionary.\n\nThat means names like "Aditya" are spelled correctly and product names stay intact. After the meeting, the tool reviews every transcript to catch mistakes. Notetaker was built by the team behind Wispr Flow dictation, where getting words right is the whole job.\n\nThe best way to see the difference is to record one meeting with Notetaker alongside your current tool and compare the transcripts.',
   },
   {
     id: 'diarization',
@@ -458,7 +458,7 @@ export const NOTETAKER_GUIDES: NotetakerGuideArticle[] = [
     title: 'Granola alternatives: Wispr Flow, Otter.AI & other competitors',
     author: 'Rob Solomon',
     date: 'Oct 8, 2026',
-    readTime: '13 MIN',
+    readTime: '12 MIN',
     variant: 'granola',
     summary:
       'A practical side-by-side comparison of modern bot-free AI notetakers across transcription accuracy, custom dictionary support, MCP integrations, and unified dictation workflows.',
@@ -472,9 +472,9 @@ export const NOTETAKER_GUIDES: NotetakerGuideArticle[] = [
     id: 'in-person-meetings',
     category: 'HOW-TO',
     title: 'How to record and transcribe an in-person meeting',
-    author: 'Garrett Yates',
-    date: 'Oct 12, 2026',
-    readTime: '17 MIN',
+    author: 'Samm Yates',
+    date: 'Oct 13, 2026',
+    readTime: '11 MIN',
     variant: 'inperson',
     summary:
       'Best practices for room mic placement, etiquette, consent prompts, and structuring crisp topic-by-topic recaps from boardrooms, coffee chats, and onsite workshops.',
@@ -486,7 +486,7 @@ export const NOTETAKER_GUIDES: NotetakerGuideArticle[] = [
   },
   {
     id: 'zoom-without-bot',
-    category: 'CAPTURE PLATFORM',
+    category: 'CAPTURE-PLATFORM',
     title: 'AI notetaker for Zoom: more accurate transcripts without a bot',
     author: 'Rob Solomon',
     date: 'Oct 28, 2026',
