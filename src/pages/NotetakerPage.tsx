@@ -42,6 +42,16 @@ import daveImg from '../assets/images/dave_gilboa_portrait_1794805451964.jpg';
 import elenaImg from '../assets/images/elena_verna_portrait_1794805451854.jpg';
 import atmosphereImg from '../assets/images/final_cta_atmosphere_1794805452889.jpg';
 import stevenImg from '../assets/images/steven_bartlett_portrait_1794805450787.jpg';
+import mikelImg from '../assets/images/mikel_video.jpg';
+import stephenImg from '../assets/images/stephen_video.jpg';
+import nathalieImg from '../assets/images/nathalie_video.jpg';
+import askAnythingIllus from '../assets/images/ask_anything_illustration.jpg';
+import cozyLaptopBg from '../assets/images/cozy_laptop_bg.jpg';
+import ipadTranscriptImg from '../assets/images/ipad_transcript_view.jpg';
+import ipadSummaryImg from '../assets/images/ipad_summary_view.jpg';
+import workflowIconStarts from '../assets/images/workflow_icon_starts.png';
+import workflowIconWhatever from '../assets/images/workflow_icon_whatever.png';
+import workflowIconConnects from '../assets/images/workflow_icon_connects.png';
 
 interface NotetakerPageProps {
   onOpenDownload: (mode?: 'dictation' | 'notetaker') => void;
@@ -754,7 +764,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
 
             <div className="max-w-[78rem] mx-auto px-8 w-full grid grid-cols-12 items-center gap-6 relative z-10">
               {/* Left Column: 5-Chapter Vertical Navigation (terracotta active accent) */}
-              <div ref={leftNavRef} className="col-span-3 flex flex-col items-start space-y-1">
+              <div ref={leftNavRef} className="col-span-3 flex flex-col items-start space-y-2.5">
                 {(
                   [
                     'The details',
@@ -763,20 +773,28 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                     'Summary',
                     'MCP',
                   ] as const
-                ).map((label, idx) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => scrollToChapter(idx)}
-                    className={`text-left text-[1.22rem] leading-[1.68] tracking-[-0.015em] transition-colors duration-200 cursor-pointer ${
-                      activeChapter === idx
-                        ? 'text-[#d14c2e] font-medium'
-                        : 'text-[#1a1a1a]/30 hover:text-[#1a1a1a]/65 font-normal'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
+                ).map((label, idx) => {
+                  const isActive = activeChapter === idx;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => scrollToChapter(idx)}
+                      className={`group flex items-center text-left text-[1.25rem] leading-[1.6] tracking-[-0.015em] transition-all duration-200 cursor-pointer ${
+                        isActive
+                          ? 'text-[#1a1a1a] font-medium'
+                          : 'text-[#1a1a1a]/35 hover:text-[#1a1a1a]/70 font-normal'
+                      }`}
+                    >
+                      <span
+                        className={`w-[3px] rounded-full mr-3 transition-all duration-200 ${
+                          isActive ? 'h-5 bg-[#d84f32] opacity-100' : 'h-0 bg-transparent opacity-0'
+                        }`}
+                      />
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Center Column: Uniform 27.5rem/29.5rem Square Morphing Stage */}
@@ -787,57 +805,54 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                 >
                   {/* Chapter 0: Cream-Beige Live Transcript Card (kept mounted to preserve GSAP feed scroll) */}
                   <div
-                    className={`relative rounded-[1.5rem] bg-[#e6e4d2] border border-[#1a1a1a]/[0.05] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] px-6 pt-6 pb-4 w-full h-full flex flex-col justify-between transition-all duration-300 ${
+                    className={`relative rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] px-6 pt-6 pb-4 w-full h-full flex flex-col justify-between transition-all duration-300 ${
                       activeChapter === 0
                         ? 'opacity-100 scale-100 pointer-events-auto'
                         : 'opacity-0 scale-[0.97] pointer-events-none absolute inset-0'
                     }`}
                     aria-hidden={activeChapter !== 0}
                   >
-                    {/* Floating Portrait 1: Top-Right */}
+                    {/* Floating Portrait 1: Top-Right (Mikel) */}
                     <button
                       type="button"
                       onClick={() =>
                         setHighlightedSpeaker((prev) =>
-                          prev === 'stephen' ? null : 'stephen'
+                          prev === 'mikel' ? null : 'mikel'
                         )
                       }
-                      aria-label="Highlight Stephen lines"
-                      className={`absolute -top-6 -right-8 w-24 h-24 rounded-[0.85rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
-                        highlightedSpeaker === 'stephen' ? 'ring-2 ring-[#03473e]' : ''
-                      }`}
-                    >
-                      <img
-                        src={daveImg}
-                        alt="Stephen"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-top"
-                      />
-                    </button>
-
-                    {/* Floating Portrait 2: Mid-Right with coral pill tag */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setHighlightedSpeaker((prev) => (prev === 'mikel' ? null : 'mikel'))
-                      }
                       aria-label="Highlight Mikel lines"
-                      className={`absolute top-[37%] -right-9 w-24 h-24 rounded-[0.85rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
+                      className={`absolute -top-7 -right-7 w-22 h-22 rounded-[1rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
                         highlightedSpeaker === 'mikel' ? 'ring-2 ring-[#03473e]' : ''
                       }`}
                     >
                       <img
-                        src={alexImg}
+                        src={mikelImg}
                         alt="Mikel"
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-top"
+                        className="w-full h-full object-cover"
                       />
-                      <span className="absolute bottom-1.5 left-1.5 rounded-full bg-[#e07a7a] text-[#ffffeb] text-[0.6rem] font-semibold px-2 py-0.5 leading-none shadow-xs">
-                        Mikel
-                      </span>
                     </button>
 
-                    {/* Floating Portrait 3: Bottom-Left with warm amber pill tag */}
+                    {/* Floating Portrait 2: Mid-Right (Stephen) */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setHighlightedSpeaker((prev) => (prev === 'stephen' ? null : 'stephen'))
+                      }
+                      aria-label="Highlight Stephen lines"
+                      className={`absolute top-[34%] -right-8 w-22 h-22 rounded-[1rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
+                        highlightedSpeaker === 'stephen' ? 'ring-2 ring-[#03473e]' : ''
+                      }`}
+                    >
+                      <img
+                        src={stephenImg}
+                        alt="Stephen"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+
+                    {/* Floating Portrait 3: Bottom-Left (Nathalie) */}
                     <button
                       ref={bottomLeftPortraitRef}
                       type="button"
@@ -847,19 +862,16 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                         )
                       }
                       aria-label="Highlight Nathalie lines"
-                      className={`absolute bottom-[10%] -left-9 w-24 h-24 rounded-[0.85rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
+                      className={`absolute bottom-[10%] -left-8 w-22 h-22 rounded-[1rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
                         highlightedSpeaker === 'nathalie' ? 'ring-2 ring-[#03473e]' : ''
                       }`}
                     >
                       <img
-                        src={elenaImg}
+                        src={nathalieImg}
                         alt="Nathalie"
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-top"
+                        className="w-full h-full object-cover"
                       />
-                      <span className="absolute bottom-1.5 left-1.5 rounded-full bg-[#e8b354] text-[#1a1a1a] text-[0.6rem] font-semibold px-2 py-0.5 leading-none shadow-xs">
-                        Nathalie
-                      </span>
                     </button>
 
                     {/* Inner Scrollable Transcript Viewport with Top/Bottom Gradient Fade */}
@@ -906,14 +918,14 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
 
                     {/* Bottom-Center Emerald Waveform Pill */}
                     <div ref={waveformPillRef} className="flex justify-center pt-2 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => setHighlightedSpeaker(null)}
-                        title="Show all speakers"
-                        className="inline-flex items-center justify-center rounded-lg bg-[#03473e] text-[#ffffeb] px-3.5 py-2 shadow-md hover:opacity-90 transition-opacity cursor-pointer"
-                      >
-                        <FlowWaveformMark className="w-4 h-3.5" />
-                      </button>
+                      <div className="inline-flex items-center justify-center rounded-full bg-[#1a1a1a] text-[#34d399] px-4 py-1.5 shadow-md">
+                        <span className="flex items-center gap-1">
+                          <span className="w-1 h-3 rounded-full bg-[#34d399] animate-pulse" />
+                          <span className="w-1 h-4 rounded-full bg-[#34d399]" />
+                          <span className="w-1 h-2 rounded-full bg-[#34d399]" />
+                          <span className="w-1.5 h-1.5 rounded-sm bg-[#34d399] ml-1" />
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -927,141 +939,68 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.98 }}
                           transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] bg-[#e6e4d2] border border-[#1a1a1a]/[0.05] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] p-6 flex flex-col justify-between relative overflow-hidden text-left"
+                          className="w-full h-full rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] p-6 flex flex-col justify-between relative overflow-hidden text-left"
                         >
                           {(() => {
                             const fullQ = "What's blocking the launch this week?";
-                            const sent = askDemoTick >= 38 || Boolean(window1AnswerNote);
+                            const sent = askDemoTick >= 36 || Boolean(window1AnswerNote);
                             const typed = fullQ.slice(0, Math.min(fullQ.length, askDemoTick));
                             return (
                               <>
-                                {/* Sent Question Pill + AI Response when sent */}
-                                <div className="min-h-[2.25rem] flex flex-col items-end gap-2 z-10">
+                                {/* Top: Sent Question Pill */}
+                                <div className="min-h-[2.5rem] flex flex-col items-end gap-2 z-10 w-full">
                                   {sent && (
                                     <motion.div
                                       initial={{ opacity: 0, y: 14, scale: 0.95 }}
                                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                                      className="rounded-xl bg-[#1a1a1a] text-[#ffffeb] px-3.5 py-2 text-xs font-medium shadow-md"
+                                      className="rounded-full bg-[#1a1a1a] text-[#ffffeb] px-4 py-2 text-xs font-medium shadow-md self-end"
                                     >
                                       {window1AnswerNote ? 'Your question' : fullQ}
                                     </motion.div>
                                   )}
-                                  {sent && (
-                                    <motion.div
-                                      initial={{ opacity: 0, y: 8 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      transition={{ delay: 0.14 }}
-                                      className="w-full rounded-xl bg-[#ffffeb]/95 border border-[#1a1a1a]/10 p-3.5 text-[0.74rem] text-[#1a1a1a]/85 leading-relaxed shadow-sm space-y-1.5"
-                                    >
-                                      {window1AnswerNote ? (
-                                        <p>{window1AnswerNote}</p>
-                                      ) : (
-                                        <>
-                                          <p className="font-medium text-[#1a1a1a]">
-                                            Mentioned across recent meetings:
-                                          </p>
-                                          <ul className="space-y-1 list-disc list-inside text-[0.72rem]">
-                                            <li>
-                                              <strong>Cheng Liu</strong> returns Oct 21 for final asset sign-off.
-                                            </li>
-                                            <li>
-                                              <strong>Mobile checkout fix</strong> ships to staging Thursday.
-                                            </li>
-                                          </ul>
-                                          <div className="pt-1 text-[0.65rem] font-semibold text-[#03473e]">
-                                            Sources: Marketing Standup · Q3 Campaign Sync
-                                          </div>
-                                        </>
-                                      )}
-                                    </motion.div>
-                                  )}
                                 </div>
 
-                                {/* Center Editorial Magnifying Glass Illustration */}
+                                {/* Center Spot Illustration (Magnifying Glass + Sprouting Botanical Stem + pink eee) */}
                                 <div
                                   className={`flex flex-col items-center justify-center text-center transition-all duration-400 my-auto ${
-                                    sent ? 'opacity-15 scale-90 -translate-y-4' : 'opacity-100 scale-100'
+                                    sent ? 'opacity-15 scale-90 -translate-y-3' : 'opacity-100 scale-100'
                                   }`}
                                 >
-                                  <svg
-                                    viewBox="0 0 110 96"
-                                    className="w-24 h-20 mb-2"
-                                    fill="none"
-                                    aria-hidden="true"
-                                  >
-                                    {/* Botanical Leaves */}
-                                    <path
-                                      d="M66 56 C78 46, 86 30, 82 18 C70 22, 62 38, 66 56 Z"
-                                      fill="#4aa96c"
-                                    />
-                                    <path
-                                      d="M68 58 C82 54, 96 44, 98 32 C84 30, 72 42, 68 58 Z"
-                                      fill="#2d6a4f"
-                                    />
-                                    {/* Document Card */}
-                                    <rect
-                                      x="30"
-                                      y="24"
-                                      width="42"
-                                      height="50"
-                                      rx="5"
-                                      fill="#f0d7ff"
-                                      stroke="#1a1a1a"
-                                      strokeWidth="2"
-                                    />
-                                    <line x1="38" y1="36" x2="62" y2="36" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" />
-                                    <line x1="38" y1="45" x2="58" y2="45" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" />
-                                    <line x1="38" y1="54" x2="54" y2="54" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" />
-                                    {/* Magnifying Glass */}
-                                    <circle
-                                      cx="47"
-                                      cy="34"
-                                      r="14"
-                                      fill="#ffffeb"
-                                      fillOpacity="0.88"
-                                      stroke="#ffa946"
-                                      strokeWidth="3.5"
-                                    />
-                                    <line
-                                      x1="37"
-                                      y1="44"
-                                      x2="26"
-                                      y2="56"
-                                      stroke="#1a1a1a"
-                                      strokeWidth="4"
-                                      strokeLinecap="round"
-                                    />
-                                  </svg>
-                                  <p className="font-display text-[1.15rem] leading-tight text-[#1a1a1a]/80">
+                                  <img
+                                    src={askAnythingIllus}
+                                    alt="Ask anything about your meetings"
+                                    className="w-24 h-20 object-contain mb-3 drop-shadow-xs"
+                                  />
+                                  <p className="font-display text-[1.25rem] leading-[1.18] text-[#1a1a1a]">
                                     Ask anything about
                                     <br />
-                                    your meetings
+                                    <em className="italic font-normal">your meetings</em>
                                   </p>
                                 </div>
 
                                 {/* Bottom Prompt Composer with Auto-Typing Demo */}
                                 <form
                                   onSubmit={handleWindow1Ask}
-                                  className="rounded-xl bg-[#ffffeb] border border-[#1a1a1a]/12 px-3.5 py-2.5 flex items-center gap-2 shadow-sm z-10"
+                                  className="rounded-full bg-[#ffffff] border border-[#1a1a1a]/10 px-5 py-3 flex items-center justify-between shadow-xs z-10 w-full"
                                 >
                                   <input
                                     type="text"
                                     value={
                                       window1Input ||
-                                      (!sent && askDemoTick > 0
+                                      (!sent
                                         ? typed
                                         : '')
                                     }
                                     onChange={(e) => setWindow1Input(e.target.value)}
-                                    placeholder="Ask anything"
-                                    className="flex-1 bg-transparent text-xs text-[#1a1a1a] placeholder:text-[#1a1a1a]/45 focus:outline-none"
+                                    placeholder={sent ? "Ask a follow up about your meetings" : "Ask anything"}
+                                    className="flex-1 bg-transparent text-xs text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:outline-none"
                                   />
                                   <button
                                     type="submit"
                                     aria-label="Send question"
-                                    className="w-6 h-6 rounded-full bg-[#1a1a1a] text-[#ffffeb] flex items-center justify-center hover:opacity-85 cursor-pointer shrink-0"
+                                    className="w-5 h-5 rounded-full bg-[#1a1a1a]/10 hover:bg-[#1a1a1a] text-[#1a1a1a] hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
                                   >
-                                    <Send className="w-3 h-3" />
+                                    <ArrowRight className="w-2.5 h-2.5" />
                                   </button>
                                 </form>
                               </>
@@ -1071,220 +1010,38 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                       )}
 
                       {activeChapter === 2 && (
-                        /* Chapter 2: What did I miss? — Zoom-Out Framed Tablet App Showcase */
+                        /* Chapter 2: What did I miss? — Cozy Atmospheric Backdrop to iPad Transcript View */
                         <motion.div
                           key="chapter-missed"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
                           transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] bg-[#141414] p-2.5 shadow-2xl overflow-hidden text-left"
+                          className="w-full h-full rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden relative flex items-center justify-center"
                         >
-                          <motion.div
-                            initial={{ scale: 1.32, x: -32, y: -24 }}
-                            animate={{ scale: 1, x: 0, y: 0 }}
-                            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-                            className="w-full h-full rounded-[1.15rem] bg-[#ffffff] text-[#1a1a1a] p-4 flex flex-col justify-between overflow-hidden"
-                          >
-                            <div>
-                              <div className="flex items-center justify-between text-[0.65rem] text-[#1a1a1a]/45 mb-2">
-                                <div className="flex items-center gap-1">
-                                  <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
-                                  <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
-                                  <span className="w-2 h-2 rounded-full bg-[#28c840]" />
-                                </div>
-                                <span>20 Feb 2026</span>
-                              </div>
-                              <div className="font-display text-lg mb-2">
-                                Q3 Campaign Planning
-                              </div>
-                              <div className="flex items-center gap-1.5 border-b border-[#1a1a1a]/10 pb-2 mb-3 text-[0.68rem]">
-                                {(
-                                  [
-                                    { id: 'insights', label: 'My Thoughts' },
-                                    { id: 'transcript', label: 'Transcript' },
-                                    { id: 'summary', label: 'Summary' },
-                                  ] as const
-                                ).map((t) => (
-                                  <button
-                                    key={t.id}
-                                    type="button"
-                                    onClick={() => setWindow2Tab(t.id)}
-                                    className={`px-2 py-0.5 rounded font-medium cursor-pointer transition-colors ${
-                                      window2Tab === t.id
-                                        ? 'bg-[#e6e4d2] text-[#1a1a1a]'
-                                        : 'text-[#1a1a1a]/55 hover:text-[#1a1a1a]'
-                                    }`}
-                                  >
-                                    {t.label}
-                                  </button>
-                                ))}
-                              </div>
-
-                              <AnimatePresence>
-                                {catchUpOpen && (
-                                  <motion.div
-                                    initial={{ opacity: 0, y: -6 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -6 }}
-                                    className="mb-2.5 rounded-lg bg-[#cef5ca]/70 border border-[#03473e]/20 p-2.5 text-[0.68rem] text-[#1a1a1a]"
-                                  >
-                                    <div className="font-semibold text-[#03473e] mb-0.5">
-                                      Last 5 minutes recap
-                                    </div>
-                                    Team agreed to shift 20% paid spend, test the loyalty offer next week, and send the design brief by EOD.
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-
-                              <div className="space-y-2.5 text-[0.7rem] leading-snug text-[#1a1a1a]/80">
-                                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f4f2e4] px-2.5 py-1 text-[0.62rem] font-mono text-[#1a1a1a]/70">
-                                  <FlowWaveformMark className="w-3 h-2.5 text-[#03473e]" />
-                                  <span>28:32</span>
-                                </div>
-                                <div>
-                                  <div className="text-[0.62rem] text-[#1a1a1a]/45 mb-0.5">Stephen</div>
-                                  <p>Where are we landing on the budget?</p>
-                                </div>
-                                <div>
-                                  <div className="text-[0.62rem] text-[#e59a38] mb-0.5">Nathalie</div>
-                                  <p>
-                                    My team wants to cut paid social spend by 20% and reallocate. Let&apos;s confirm channel ROI first.
-                                  </p>
-                                </div>
-                                <div>
-                                  <div className="text-[0.62rem] text-[#5b9bd5] mb-0.5">Mikel</div>
-                                  <p>What about testing the loyalty offer next week?</p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2 border-t border-[#1a1a1a]/8">
-                              <span className="text-[0.66rem] text-[#1a1a1a]/40">Ask anything...</span>
-                              <button
-                                type="button"
-                                onClick={() => setCatchUpOpen((v) => !v)}
-                                className="inline-flex items-center gap-1 rounded-md bg-[#ffffeb] border border-[#1a1a1a]/15 px-2.5 py-1 text-[0.66rem] font-semibold text-[#1a1a1a] hover:bg-[#cef5ca] transition-colors cursor-pointer shadow-xs"
-                              >
-                                <Sparkles className="w-2.5 h-2.5 text-[#03473e]" />
-                                <span>What did I miss?</span>
-                              </button>
-                            </div>
-                          </motion.div>
+                          <img
+                            src={ipadTranscriptImg}
+                            alt="What did I miss transcript"
+                            className="w-full h-full object-cover"
+                          />
                         </motion.div>
                       )}
 
                       {activeChapter === 3 && (
-                        /* Chapter 3: Summary — Atmospheric Photo Backdrop + "Generating Flow Summary..." Window */
+                        /* Chapter 3: Summary — iPad Enhanced Summary View */
                         <motion.div
                           key="chapter-summary"
                           initial={{ opacity: 0, scale: 0.98 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.98 }}
                           transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] overflow-hidden relative p-5 flex items-center justify-center shadow-2xl text-left"
+                          className="w-full h-full rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden relative flex items-center justify-center"
                         >
                           <img
-                            src={atmosphereImg}
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover scale-105"
+                            src={ipadSummaryImg}
+                            alt="Generating Flow Summary"
+                            className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-[#1a120d]/45 backdrop-blur-[2px]" />
-
-                          <div className="relative z-10 w-full h-full rounded-xl bg-[#ffffff] text-[#1a1a1a] p-4 shadow-2xl flex flex-col justify-between overflow-hidden">
-                            <div>
-                              <div className="flex items-center justify-between text-[0.65rem] text-[#1a1a1a]/45 mb-2">
-                                <div className="flex items-center gap-1">
-                                  <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
-                                  <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
-                                  <span className="w-2 h-2 rounded-full bg-[#28c840]" />
-                                </div>
-                                <span>Enhanced Note</span>
-                              </div>
-                              <div className="font-display text-lg mb-2">
-                                Q3 Campaign Planning
-                              </div>
-                              <div className="flex items-center gap-1.5 border-b border-[#1a1a1a]/10 pb-2 mb-3 text-[0.66rem]">
-                                <span className="px-2 py-0.5 rounded bg-[#f4f2e4] font-semibold">
-                                  Summary
-                                </span>
-                                <span className="text-[#1a1a1a]/45">Transcript</span>
-                              </div>
-
-                              <div className="rounded-lg bg-[#faf9f2] border border-[#1a1a1a]/8 p-3 space-y-2.5">
-                                <div className="flex items-center gap-1.5 text-[0.62rem] font-semibold uppercase tracking-wider text-[#03473e]">
-                                  <Sparkles className="w-3 h-3" />
-                                  <span>ENHANCED SUMMARY</span>
-                                </div>
-                                <div className="text-xs font-semibold text-[#1a1a1a]">
-                                  {summaryStep < 3
-                                    ? 'Generating Flow Summary...'
-                                    : 'Summary ready'}
-                                </div>
-
-                                <div className="space-y-2 text-[0.7rem] text-[#1a1a1a]/80">
-                                  {[
-                                    'Building comprehensive contextual summary',
-                                    'Mapping out dependencies and blockers',
-                                    'Consolidating action items with owners',
-                                  ].map((stepLabel, sIdx) => {
-                                    const done = summaryStep > sIdx;
-                                    const current = summaryStep === sIdx;
-                                    return (
-                                      <div
-                                        key={stepLabel}
-                                        className={`flex items-center gap-2 transition-opacity duration-300 ${
-                                          done || current ? 'opacity-100' : 'opacity-35'
-                                        }`}
-                                      >
-                                        <span
-                                          className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[0.55rem] font-bold shrink-0 ${
-                                            done
-                                              ? 'bg-[#03473e] text-[#ffffeb]'
-                                              : current
-                                              ? 'bg-[#ffa946] text-[#1a1a1a]'
-                                              : 'bg-[#1a1a1a]/15 text-[#1a1a1a]/50'
-                                          }`}
-                                        >
-                                          {done ? '✓' : '•'}
-                                        </span>
-                                        <span className={done ? 'font-medium text-[#1a1a1a]' : ''}>
-                                          {stepLabel}
-                                        </span>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Interactive Topic Tabs once ready */}
-                            <div className="pt-2 border-t border-[#1a1a1a]/8 flex items-center justify-between text-[0.65rem]">
-                              <div className="flex gap-1">
-                                {(['timelines', 'decisions', 'next-steps'] as const).map((t) => (
-                                  <button
-                                    key={t}
-                                    type="button"
-                                    onClick={() => setActiveSummaryChapter(t)}
-                                    className={`px-2 py-0.5 rounded capitalize cursor-pointer ${
-                                      activeSummaryChapter === t
-                                        ? 'bg-[#1a1a1a] text-[#ffffeb] font-semibold'
-                                        : 'text-[#1a1a1a]/55 hover:text-[#1a1a1a]'
-                                    }`}
-                                  >
-                                    {t.replace('-', ' ')}
-                                  </button>
-                                ))}
-                              </div>
-                              <span className="text-[#03473e] font-semibold">
-                                {activeSummaryChapter === 'timelines'
-                                  ? 'Oct 21 · QA'
-                                  : activeSummaryChapter === 'decisions'
-                                  ? 'Asana + Tableau'
-                                  : '3 owners'}
-                              </span>
-                            </div>
-                          </div>
                         </motion.div>
                       )}
 
@@ -1296,63 +1053,57 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.98 }}
                           transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] bg-[#111111] text-[#ffffeb] p-7 flex flex-col justify-between items-center text-center shadow-2xl"
+                          className="w-full h-full rounded-[1.5rem] bg-[#161616] text-[#ffffeb] p-7 flex flex-col justify-between items-center text-center shadow-2xl"
                         >
-                          <div className="pt-2 text-[#ffffeb]/35">
-                            <Sparkles className="w-5 h-5 mx-auto" />
+                          {/* Claude 8-pointed star / asterisk */}
+                          <div className="pt-1 text-white font-serif text-3xl select-none">
+                            ✹
                           </div>
 
                           <div className="w-full space-y-4">
-                            <h4 className="font-display text-2xl sm:text-[1.85rem] leading-tight text-[#ffffeb]">
+                            <h4 className="font-sans font-bold text-xl sm:text-2xl text-[#ffffff]">
                               What should we work on?
                             </h4>
 
                             {(() => {
-                              const selected =
-                                MCP_TOOLS.find((m) => m.id === activeMcpTool) || MCP_TOOLS[0];
-                              const samplePrompt = `Use the last meeting to draft follow-ups in ${selected.name}...`;
+                              const samplePrompt = 'Use the last week of meetings';
                               const typed = samplePrompt.slice(
                                 0,
                                 Math.min(samplePrompt.length, mcpDemoTick)
                               );
                               return (
-                                <div className="rounded-xl bg-[#1b1b1b] border border-white/10 p-4 text-left space-y-3">
-                                  <div className="min-h-[3.5rem] text-xs text-[#ffffeb]/85 leading-relaxed">
+                                <div className="rounded-2xl bg-[#242424] border border-white/5 p-4 text-left relative min-h-[5.5rem] flex flex-col justify-between">
+                                  <div className="text-xs text-[#ffffff]/90 leading-relaxed font-sans">
                                     {typed || (
-                                      <span className="text-[#ffffeb]/40">
+                                      <span className="text-[#ffffff]/35">
                                         Write a message...
                                       </span>
                                     )}
                                   </div>
-                                  <div className="flex items-center justify-between pt-1">
-                                    <div className="flex items-center gap-1">
-                                      {MCP_TOOLS.map((tool) => (
-                                        <button
-                                          key={tool.id}
-                                          type="button"
-                                          onClick={() => setActiveMcpTool(tool.id)}
-                                          className={`px-2 py-0.5 rounded text-[0.65rem] font-medium transition-colors cursor-pointer ${
-                                            activeMcpTool === tool.id
-                                              ? 'bg-[#ffffeb] text-[#111111]'
-                                              : 'bg-white/10 text-[#ffffeb]/65 hover:text-[#ffffeb]'
-                                          }`}
-                                        >
-                                          {tool.name}
-                                        </button>
-                                      ))}
-                                    </div>
-                                    <span className="w-5 h-5 rounded-full bg-[#ffffeb] text-[#111111] flex items-center justify-center">
-                                      <ArrowRight className="w-3 h-3" />
-                                    </span>
+                                  <div className="flex justify-end pt-2">
+                                    <button
+                                      type="button"
+                                      aria-label="Submit"
+                                      className="w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                                    >
+                                      <span className="w-2 h-2 rounded-xs bg-white" />
+                                    </button>
                                   </div>
                                 </div>
                               );
                             })()}
                           </div>
 
-                          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[0.7rem] font-medium text-[#ffffeb]/75">
-                            <FlowWaveformMark className="w-3.5 h-3" />
-                            <span>MCP Connected</span>
+                          {/* Bottom waveform capsule matching video */}
+                          <div className="inline-flex items-center justify-center rounded-full bg-[#242424] border border-white/10 px-4 py-1.5 shadow-md">
+                            <span className="flex items-center gap-1">
+                              <span className="w-0.5 h-2 rounded-full bg-white/80" />
+                              <span className="w-0.5 h-3.5 rounded-full bg-white" />
+                              <span className="w-0.5 h-2 rounded-full bg-white/80" />
+                              <span className="w-0.5 h-1.5 rounded-full bg-white/60" />
+                              <span className="w-0.5 h-3 rounded-full bg-white" />
+                              <span className="w-0.5 h-2 rounded-full bg-white/80" />
+                            </span>
                           </div>
                         </motion.div>
                       )}
