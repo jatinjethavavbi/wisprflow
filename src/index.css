@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+:root {
+  --color-lumen: #ffffeb;
+  --color-lumen-dark: #e4e4d0;
+  --color-vast: #1a1a1a;
+  --color-fathom: #034f46;
+  --color-dawn: #f0d7ff;
+  --color-glow: #ffa946;
+  --color-flare: #ff6c4c;
+  --color-signal: #ffbcf2;
+  --color-pulse: #7f1c34;
+  --color-mint: #34d399;
+  --color-success-green: #cef5ca;
+  --font-serif: "EB Garamond", Georgia, serif;
+  --font-sans: "Figtree", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-lumen);
+    color: var(--color-vast);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-lumen);
+    color: var(--color-vast);
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: var(--color-dawn);
+    color: var(--color-vast);
+  }
+}
+
+.font-display {
+  font-family: var(--font-serif);
+}
+
+.font-body {
+  font-family: var(--font-sans);
+}
+
+.font-code {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 34s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Custom subtle scrollbars for FAQ list and testimonial rail */
+.wispr-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.wispr-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wispr-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 235, 0.25);
+  border-radius: 9999px;
+}
+
+.wispr-scroll-dark::-webkit-scrollbar {
+  width: 5px;
+}
+
+.wispr-scroll-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wispr-scroll-dark::-webkit-scrollbar-thumb {
+  background: rgba(0, 18, 15, 0.55);
+  border-radius: 9999px;
+}
+
+.wispr-scroll-light::-webkit-scrollbar {
+  width: 5px;
+}
+
+.wispr-scroll-light::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wispr-scroll-light::-webkit-scrollbar-thumb {
+  background: rgba(26, 26, 26, 0.16);
+  border-radius: 9999px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Exact Wispr Flow Hero Curve & Lottie Positioning */
+.hero_animation-wrapper-v2 {
+  z-index: 0;
+  transform-origin: 50% 100%;
+  margin-top: -21vw;
+  margin-bottom: 5rem;
+  transition: opacity 0.1s;
+  display: flex;
+  position: relative;
+  transform: scale(1.5);
+  pointer-events: none;
+}
+
+.hero_animation {
+  width: 50%;
+  font-size: 1.125rem;
+  display: flex;
+}
+
+.hero_animation.is-left {
+  margin-top: -9px;
+}
+
+.hero_animation.is-right {
+  margin-top: 0;
+}
+
+.hero_animation-lottie {
+  z-index: 10;
+  width: 11%;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  inset: auto 0% 2.5%;
+  pointer-events: auto;
+}
+
+.hero_animation-lottie svg text {
+  font-family: "Figtree", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.hero_animation-lottie-bg {
+  z-index: 9;
+  background-color: var(--color-lumen);
+  filter: blur(5px);
+  border-radius: 100%;
+  width: 5%;
+  height: 5rem;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  inset: auto 0% 2.5%;
+}
+
+@media screen and (max-width: 991px) {
+  .hero_animation-wrapper-v2 {
+    margin-top: -17vw;
+    margin-bottom: 4rem;
+    transform: scale(1.6);
+  }
+  .hero_animation.is-left {
+    font-size: 1.9rem;
+  }
+  .hero_animation.is-right {
+    margin-top: -8px;
+    font-size: 1.75rem;
+  }
+  .hero_animation-lottie {
+    width: 14%;
+    bottom: 0%;
+  }
+  .hero_animation-lottie-bg {
+    width: 8%;
+    bottom: 0%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .hero_animation-wrapper-v2 {
+    margin-top: 0;
+    margin-bottom: 3rem;
+  }
+  .hero_animation.is-left,
+  .hero_animation.is-right {
+    font-size: 2rem;
+    margin-top: -5px;
+  }
+  .hero_animation-lottie {
+    width: 17%;
+    bottom: -1.5%;
+  }
+  .hero_animation-lottie-bg {
+    bottom: -1.5%;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .hero_animation-wrapper-v2 {
+    margin-top: 0.5rem;
+    margin-bottom: 2.5rem;
+    transform: scale(1.5);
+  }
+  .hero_animation.is-left {
+    margin-top: -1px;
+    font-size: 4rem;
+    position: relative;
+    left: -3px;
+  }
+  .hero_animation.is-right {
+    margin-top: 0;
+    font-size: 3.7rem;
+  }
+  .hero_animation-lottie {
+    width: 26%;
+    bottom: -7%;
+  }
+  .hero_animation-lottie-bg {
+    width: 13%;
+    bottom: -7%;
+  }
+}
+
