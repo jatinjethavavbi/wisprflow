@@ -78,7 +78,7 @@ export const Testimonials: React.FC = () => {
         const orbitPx = (vw * ORBIT_VW) / 100;
         const isPortrait = vh > vw;
         const step = (isPortrait ? 1.4 : 1.0) / cards.length;
-        const travelHalf = (vw * TRAVEL_VW) / 200;
+        const travelHalf = (vw * TRAVEL_VW) / 150;
 
         gsap.set(cards, {
           xPercent: -50,
