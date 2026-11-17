@@ -5,6 +5,7 @@ import { AnnouncementBar } from './sections/AnnouncementBar/AnnouncementBar';
 import { Navbar } from './sections/Navbar/Navbar';
 import { Footer } from './sections/Footer/Footer';
 import { DownloadModal } from './components/Modals';
+import { PrivacyPreferencesWidget } from './components/PrivacySettingsModal';
 import { Home } from './pages/Home';
 import { NotetakerPage } from './pages/NotetakerPage';
 import { BusinessPage } from './pages/BusinessPage';
@@ -165,6 +166,7 @@ const AppShell: React.FC = () => {
         onClose={() => setDownloadOpen(false)}
         initialMode={downloadMode}
       />
+      <PrivacyPreferencesWidget />
     </div>
   );
 };

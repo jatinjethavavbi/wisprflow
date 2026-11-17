@@ -293,18 +293,20 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload }) => {
               </AppLink>
             </div>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-2 text-[#1a1a1a]/65">
-              <AppLink
-                to="/data-controls"
-                className="hover:text-[#1a1a1a] transition-colors"
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-privacy-settings'))}
+                className="hover:text-[#1a1a1a] transition-colors cursor-pointer text-left"
               >
                 Do Not Sell or Share My Personal Information
-              </AppLink>
-              <AppLink
-                to="/privacy"
-                className="hover:text-[#1a1a1a] transition-colors"
+              </button>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-privacy-settings'))}
+                className="hover:text-[#1a1a1a] transition-colors cursor-pointer text-left"
               >
                 Privacy Settings
-              </AppLink>
+              </button>
             </div>
           </div>
 

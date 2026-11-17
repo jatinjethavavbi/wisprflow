@@ -2104,35 +2104,6 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div className="fixed bottom-6 left-6 z-50 pointer-events-auto">
-        <button
-          type="button"
-          aria-label="Privacy & Preferences"
-          className="w-11 h-11 rounded-full bg-[#d8b4e2] text-white flex items-center justify-center shadow-[0_4px_18px_rgba(0,0,0,0.18)] hover:scale-108 hover:shadow-[0_6px_22px_rgba(0,0,0,0.24)] transition-all cursor-pointer"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="w-6 h-6 stroke-current fill-none stroke-[1.8]"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 1a10 10 0 0 0-1.8.16" />
-            <path d="M7.34 3.65a10 10 0 0 0-2.6 3.6" />
-            <path d="M4.1 11a10 10 0 0 0 .5 3.5" />
-            <path d="M6.2 18.2a10 10 0 0 0 4.1 2.4" />
-            <path d="M14 21.6a10 10 0 0 0 4.2-1.8" />
-            <path d="M20.5 15.5a10 10 0 0 0 .5-3.5" />
-            <path d="M19.7 7.5a10 10 0 0 0-2.3-3" />
-            <path d="M12 5a7 7 0 0 0-6.7 5.1" />
-            <path d="M5.5 13a7 7 0 0 0 1.2 3.8" />
-            <path d="M9.8 19a7 7 0 0 0 5.4-.5" />
-            <path d="M17.5 15a7 7 0 0 0 .5-3" />
-            <path d="M16.5 8a7 7 0 0 0-3.3-2.5" />
-            <path d="M12 9a3 3 0 0 0-3 3c0 2 1 3.5 3 3.5s3-1.5 3-3.5a3 3 0 0 0-3-3" />
-          </svg>
-        </button>
-      </div>
     </div>
   );
 };
