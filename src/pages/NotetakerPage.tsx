@@ -4,16 +4,13 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronRight,
-  ClipboardCheck,
   EyeOff,
   FileText,
   Lock,
   Mic,
-  Power,
   Search,
   Send,
   ShieldCheck,
-  SlidersHorizontal,
   Sparkles,
   Users,
   X,
@@ -45,23 +42,9 @@ import daveImg from '../assets/images/dave_gilboa_portrait_1794805451964.jpg';
 import elenaImg from '../assets/images/elena_verna_portrait_1794805451854.jpg';
 import atmosphereImg from '../assets/images/final_cta_atmosphere_1794805452889.jpg';
 import stevenImg from '../assets/images/steven_bartlett_portrait_1794805450787.jpg';
-import mikelImg from '../assets/images/mikel_video.jpg';
-import stephenImg from '../assets/images/stephen_video.jpg';
-import nathalieImg from '../assets/images/nathalie_video.jpg';
-import askAnythingIllus from '../assets/images/ask_anything_illustration.jpg';
-import cozyLaptopBg from '../assets/images/cozy_laptop_bg.jpg';
-import ipadTranscriptImg from '../assets/images/ipad_transcript_view.jpg';
-import ipadSummaryImg from '../assets/images/ipad_summary_view.jpg';
 import workflowIconStarts from '../assets/images/workflow_icon_starts.png';
 import workflowIconWhatever from '../assets/images/workflow_icon_whatever.png';
 import workflowIconConnects from '../assets/images/workflow_icon_connects.png';
-import switchMigrationIllus from '../assets/images/switch_migration_illustration.png';
-import granolaGuideImg from '../assets/images/granola_alt_guide.png';
-import inPersonGuideImg from '../assets/images/in_person_guide.png';
-import zoomGuideImg from '../assets/images/zoom_nt_guide.png';
-import robSolomonAvatar from '../assets/images/rob_solomon_avatar.png';
-import sammYatesAvatar from '../assets/images/samm_yates_avatar.png';
-import ntCtaBg from '../assets/images/nt_cta_bg.webp';
 
 interface NotetakerPageProps {
   onOpenDownload: (mode?: 'dictation' | 'notetaker') => void;
@@ -108,9 +91,10 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
   const [activeChapter, setActiveChapter] = useState(0);
   const activeChapterRef = useRef(0);
   const [activeMcpTool, setActiveMcpTool] = useState<string>('claude');
-  const [askDemoTick, setAskDemoTick] = useState(0);
+  const [askPhase, setAskPhase] = useState<0 | 1 | 2>(0);
+  const [catchUpPulse, setCatchUpPulse] = useState(false);
   const [summaryStep, setSummaryStep] = useState(0);
-  const [mcpDemoTick, setMcpDemoTick] = useState(0);
+  const [mcpPhase, setMcpPhase] = useState<0 | 1>(0);
 
   // Interactive states across Notetaker showcases
   const [activeQaId, setActiveQaId] = useState<string>('blockers');
@@ -131,53 +115,38 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
     'timelines' | 'decisions' | 'next-steps'
   >('timelines');
 
-  const [activeFaqId, setActiveFaqId] = useState<string>('accuracy');
+  const [openFaqId, setOpenFaqId] = useState<string | null>(null);
   const [activeGuide, setActiveGuide] = useState<NotetakerGuideArticle | null>(null);
 
   // Animation refs
   const heroRef = useRef<HTMLDivElement>(null);
-  const heroCardRef = useRef<HTMLDivElement>(null);
+  const heroFloatRef = useRef<HTMLButtonElement>(null);
   const quoteSectionRef = useRef<HTMLElement>(null);
   const captureStageRef = useRef<HTMLElement>(null);
   const walkthroughTrackRef = useRef<HTMLDivElement>(null);
+  const waveSvgRef = useRef<SVGSVGElement>(null);
   const floatingCardRef = useRef<HTMLDivElement>(null);
   const cardFeedRef = useRef<HTMLDivElement>(null);
-  const mikelAvatarRef = useRef<HTMLButtonElement>(null);
-  const stephenAvatarRef = useRef<HTMLButtonElement>(null);
+  const topRightPortraitRef = useRef<HTMLButtonElement>(null);
+  const midRightPortraitRef = useRef<HTMLButtonElement>(null);
   const bottomLeftPortraitRef = useRef<HTMLButtonElement>(null);
   const waveformPillRef = useRef<HTMLDivElement>(null);
   const leftNavRef = useRef<HTMLDivElement>(null);
-  const navIndicatorRef = useRef<HTMLDivElement>(null);
   const rightCopyRef = useRef<HTMLDivElement>(null);
-  const backgroundWaveRef = useRef<SVGPathElement>(null);
-
-  // Walkthrough Chapter Cards & Copy Refs
-  const card0Ref = useRef<HTMLDivElement>(null);
-  const card1Ref = useRef<HTMLDivElement>(null);
-  const card2Ref = useRef<HTMLDivElement>(null);
-  const card3Ref = useRef<HTMLDivElement>(null);
-  const card4Ref = useRef<HTMLDivElement>(null);
-
-  const copy0Ref = useRef<HTMLDivElement>(null);
-  const copy1Ref = useRef<HTMLDivElement>(null);
-  const copy2Ref = useRef<HTMLDivElement>(null);
-  const copy3Ref = useRef<HTMLDivElement>(null);
-  const copy4Ref = useRef<HTMLDivElement>(null);
-
-  const chapter1InputTextRef = useRef<HTMLSpanElement>(null);
-  const chapter1CursorRef = useRef<HTMLSpanElement>(null);
-  const chapter1SentPillRef = useRef<HTMLDivElement>(null);
-  const chapter1IllusRef = useRef<HTMLDivElement>(null);
-
-  const mcpPromptTextRef = useRef<HTMLSpanElement>(null);
-  const mcpCursorRef = useRef<HTMLSpanElement>(null);
-
   const workflowRef = useRef<HTMLDivElement>(null);
+  const workflowListRef = useRef<HTMLDivElement>(null);
+  const migrationCardRef = useRef<HTMLDivElement>(null);
   const enterpriseRef = useRef<HTMLDivElement>(null);
   const guidesRef = useRef<HTMLDivElement>(null);
   const finalCtaRef = useRef<HTMLElement>(null);
 
   useTextReveal(workflowRef, { stagger: 0.08, start: 'top 86%' });
+  useScrollReveal(workflowListRef, {
+    selector: '[data-wf-item]',
+    y: 22,
+    stagger: 0.12,
+    start: 'top 85%',
+  });
   useScrollReveal(enterpriseRef, {
     selector: '[data-ent-item]',
     y: 18,
@@ -216,158 +185,197 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
     return () => window.clearInterval(timer);
   }, []);
 
-  // Chapter-specific ambient showcase animations (Ask Anything typing, Summary generation steps, MCP prompt typing)
+  // Chapter-specific discrete animation timelines (zero high-frequency React re-renders)
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timers: number[] = [];
+
     if (activeChapter === 1) {
       if (reduced) {
-        setAskDemoTick(42);
+        setAskPhase(2);
         return;
       }
-      setAskDemoTick(0);
-      const id = window.setInterval(() => {
-        setAskDemoTick((prev) => (prev >= 56 ? 0 : prev + 1));
-      }, 80);
-      return () => window.clearInterval(id);
-    }
-    if (activeChapter === 3) {
+      setAskPhase(0);
+      timers.push(window.setTimeout(() => setAskPhase(1), 280));
+      timers.push(window.setTimeout(() => setAskPhase(2), 1180));
+    } else if (activeChapter === 2) {
       if (reduced) {
-        setSummaryStep(3);
+        setCatchUpPulse(false);
+        setCatchUpOpen(true);
+        return;
+      }
+      setCatchUpPulse(false);
+      setCatchUpOpen(false);
+      timers.push(window.setTimeout(() => setCatchUpPulse(true), 780));
+      timers.push(
+        window.setTimeout(() => {
+          setCatchUpPulse(false);
+          setCatchUpOpen(true);
+        }, 1240)
+      );
+    } else if (activeChapter === 3) {
+      if (reduced) {
+        setSummaryStep(4);
         return;
       }
       setSummaryStep(0);
-      const id = window.setInterval(() => {
-        setSummaryStep((prev) => (prev >= 3 ? 3 : prev + 1));
-      }, 680);
-      return () => window.clearInterval(id);
-    }
-    if (activeChapter === 4) {
+      timers.push(window.setTimeout(() => setSummaryStep(1), 460));
+      timers.push(window.setTimeout(() => setSummaryStep(2), 940));
+      timers.push(window.setTimeout(() => setSummaryStep(3), 1440));
+      timers.push(window.setTimeout(() => setSummaryStep(4), 2100));
+    } else if (activeChapter === 4) {
       if (reduced) {
-        setMcpDemoTick(48);
+        setMcpPhase(1);
         return;
       }
-      setMcpDemoTick(0);
-      const id = window.setInterval(() => {
-        setMcpDemoTick((prev) => (prev >= 64 ? 0 : prev + 1));
-      }, 85);
-      return () => window.clearInterval(id);
+      setMcpPhase(0);
+      timers.push(window.setTimeout(() => setMcpPhase(1), 320));
     }
+
+    return () => {
+      timers.forEach((id) => window.clearTimeout(id));
+    };
   }, [activeChapter]);
 
-  // Entrance + subtle scroll parallax for hero stack & emerald transcript bubbles
+  // Entrance, ambient hero float, emerald parallax, & scroll-choreographed desktop walkthrough
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const ctx = gsap.context(() => {
-      // Hero reveal & subtle ambient card floating
       if (heroRef.current) {
         const items = heroRef.current.querySelectorAll('[data-nt-hero]');
         gsap.fromTo(
           items,
-          { opacity: 0, y: 22 },
+          { opacity: 0, y: 18 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            stagger: 0.08,
+            duration: 0.65,
+            stagger: 0.07,
             ease: 'power3.out',
             clearProps: 'transform,opacity',
           }
         );
       }
 
-      if (heroCardRef.current) {
-        gsap.to(heroCardRef.current, {
-          y: '-=6',
-          rotation: 0.8,
-          duration: 3.4,
+      if (heroFloatRef.current) {
+        gsap.to(heroFloatRef.current, {
+          y: -5,
+          rotation: 0.55,
+          duration: 3.1,
+          ease: 'sine.inOut',
           repeat: -1,
           yoyo: true,
-          ease: 'sine.inOut',
         });
       }
 
-      // Emerald capture stage: ambient continuous floating + scroll convergence scrub
-      if (captureStageRef.current) {
-        const allBubbles = captureStageRef.current.querySelectorAll<HTMLElement>(
-          '[data-bubble-fg], [data-bubble-bg]'
-        );
-        allBubbles.forEach((bubble, idx) => {
-          const dir = idx % 2 === 0 ? 1 : -1;
-          gsap.to(bubble, {
-            y: `+=${dir * 6}`,
-            x: `+=${dir * 3}`,
-            rotation: dir * 1.3,
-            duration: 2.8 + idx * 0.35,
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut',
-          });
-        });
+      if (quoteSectionRef.current) {
+        const quoteBlock = quoteSectionRef.current.querySelector('[data-nt-quote]');
+        if (quoteBlock) {
+          gsap.fromTo(
+            quoteBlock,
+            { opacity: 0, y: 20 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: quoteBlock,
+                start: 'top 86%',
+                once: true,
+              },
+            }
+          );
+        }
+      }
 
-        const leftBubbles = captureStageRef.current.querySelectorAll('[data-bubble-left]');
-        const rightBubbles = captureStageRef.current.querySelectorAll('[data-bubble-right]');
-        if (leftBubbles.length) {
-          gsap.to(leftBubbles, {
-            x: 36,
-            y: 28,
-            scale: 0.94,
-            opacity: 0.55,
-            ease: 'power1.out',
-            scrollTrigger: {
-              trigger: captureStageRef.current,
-              start: 'center center',
-              end: 'bottom top',
-              scrub: 1,
-            },
-          });
+      if (captureStageRef.current) {
+        const fgBubbles = captureStageRef.current.querySelectorAll('[data-bubble-fg]');
+        const bgBubbles = captureStageRef.current.querySelectorAll('[data-bubble-bg]');
+        if (fgBubbles.length) {
+          gsap.fromTo(
+            fgBubbles,
+            { y: 18 },
+            {
+              y: -18,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: captureStageRef.current,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.6,
+              },
+            }
+          );
         }
-        if (rightBubbles.length) {
-          gsap.to(rightBubbles, {
-            x: -36,
-            y: 28,
-            scale: 0.94,
-            opacity: 0.55,
-            ease: 'power1.out',
-            scrollTrigger: {
-              trigger: captureStageRef.current,
-              start: 'center center',
-              end: 'bottom top',
-              scrub: 1,
-            },
-          });
+        if (bgBubbles.length) {
+          gsap.fromTo(
+            bgBubbles,
+            { y: 9 },
+            {
+              y: -9,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: captureStageRef.current,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.6,
+              },
+            }
+          );
         }
+      }
+
+      if (migrationCardRef.current) {
+        gsap.fromTo(
+          migrationCardRef.current,
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: migrationCardRef.current,
+              start: 'top 86%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      if (finalCtaRef.current) {
+        gsap.fromTo(
+          finalCtaRef.current,
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.75,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: finalCtaRef.current,
+              start: 'top 88%',
+              once: true,
+            },
+          }
+        );
       }
     });
 
-    // Desktop end-to-end scroll handoff: Floating card glides across intro headline -> Master Scroll-Pinned Walkthrough
+    // Desktop end-to-end scroll handoff: Emerald bubbles -> Floating card glides across intro headline -> Sticky 3-column walkthrough
     const mm = gsap.matchMedia();
     mm.add('(min-width: 1024px)', () => {
       const track = walkthroughTrackRef.current;
       if (!track) return;
 
-      // 1. Initial states of stacked elements
-      gsap.set([card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current], {
-        opacity: 0,
-        scale: 0.96,
-      });
-      gsap.set([copy1Ref.current, copy2Ref.current, copy3Ref.current, copy4Ref.current], {
-        opacity: 0,
-        y: 16,
-      });
-      if (card0Ref.current) gsap.set(card0Ref.current, { opacity: 1, scale: 1 });
-      if (copy0Ref.current) gsap.set(copy0Ref.current, { opacity: 1, y: 0 });
-      if (chapter1InputTextRef.current) gsap.set(chapter1InputTextRef.current, { maxWidth: '0%' });
-      if (chapter1SentPillRef.current) gsap.set(chapter1SentPillRef.current, { opacity: 0, y: 10, scale: 0.92 });
-      if (mcpPromptTextRef.current) gsap.set(mcpPromptTextRef.current, { maxWidth: '0%' });
-
-      // 2. Entrance handoff timeline (from Emerald headline into Walkthrough)
       const arrivalTl = gsap.timeline({
         scrollTrigger: {
           trigger: track,
-          start: 'top 85%',
+          start: 'top bottom',
           end: 'top top',
-          scrub: 0.8,
+          scrub: true,
           invalidateOnRefresh: true,
         },
       });
@@ -375,231 +383,118 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       if (floatingCardRef.current) {
         arrivalTl.fromTo(
           floatingCardRef.current,
-          { y: 140, opacity: 0.8 },
-          { y: 0, opacity: 1, ease: 'power2.out', duration: 1 },
+          { y: () => -Math.round(window.innerHeight * 0.88) },
+          { y: 0, ease: 'none', duration: 1 },
           0
+        );
+      }
+
+      if (topRightPortraitRef.current) {
+        arrivalTl.fromTo(
+          topRightPortraitRef.current,
+          { opacity: 0.5, scale: 0.9, y: 14 },
+          { opacity: 1, scale: 1, y: 0, ease: 'power2.out', duration: 0.45 },
+          0.18
+        );
+      }
+
+      if (midRightPortraitRef.current) {
+        arrivalTl.fromTo(
+          midRightPortraitRef.current,
+          { opacity: 0.5, scale: 0.9, y: 16 },
+          { opacity: 1, scale: 1, y: 0, ease: 'power2.out', duration: 0.45 },
+          0.32
         );
       }
 
       if (bottomLeftPortraitRef.current) {
         arrivalTl.fromTo(
           bottomLeftPortraitRef.current,
-          { opacity: 0, scale: 0.8, y: 16 },
-          { opacity: 1, scale: 1, y: 0, ease: 'back.out(1.4)', duration: 0.4 },
-          0.4
-        );
-      }
-
-      if (mikelAvatarRef.current) {
-        arrivalTl.fromTo(
-          mikelAvatarRef.current,
-          { opacity: 0, scale: 0.8, y: -12 },
-          { opacity: 1, scale: 1, y: 0, ease: 'back.out(1.4)', duration: 0.4 },
-          0.45
-        );
-      }
-
-      if (stephenAvatarRef.current) {
-        arrivalTl.fromTo(
-          stephenAvatarRef.current,
-          { opacity: 0, scale: 0.8, x: 14 },
-          { opacity: 1, scale: 1, x: 0, ease: 'back.out(1.4)', duration: 0.4 },
-          0.5
+          { opacity: 0, scale: 0.88, y: 12 },
+          { opacity: 1, scale: 1, y: 0, ease: 'power2.out', duration: 0.35 },
+          0.56
         );
       }
 
       if (waveformPillRef.current) {
         arrivalTl.fromTo(
           waveformPillRef.current,
-          { opacity: 0, scale: 0.85 },
-          { opacity: 1, scale: 1, ease: 'power2.out', duration: 0.35 },
-          0.6
+          { opacity: 0, scale: 0.86 },
+          { opacity: 1, scale: 1, ease: 'power2.out', duration: 0.32 },
+          0.62
         );
       }
 
       if (leftNavRef.current) {
         arrivalTl.fromTo(
           leftNavRef.current,
-          { opacity: 0, x: -20 },
-          { opacity: 1, x: 0, ease: 'power2.out', duration: 0.35 },
-          0.65
+          { opacity: 0, x: -16 },
+          { opacity: 1, x: 0, ease: 'power2.out', duration: 0.32 },
+          0.68
         );
       }
 
       if (rightCopyRef.current) {
         arrivalTl.fromTo(
           rightCopyRef.current,
-          { opacity: 0, y: 16 },
-          { opacity: 1, y: 0, ease: 'power2.out', duration: 0.35 },
-          0.65
+          { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, ease: 'power2.out', duration: 0.32 },
+          0.68
         );
       }
 
-      // 3. Master Walkthrough Storytelling Timeline (Scrubbed with ScrollTrigger)
-      const masterTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: track,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1,
-          onUpdate: (self) => {
-            const p = self.progress;
-            const nextIdx =
-              p < 0.20 ? 0 : p < 0.40 ? 1 : p < 0.60 ? 2 : p < 0.80 ? 3 : 4;
-            if (nextIdx !== activeChapterRef.current) {
-              activeChapterRef.current = nextIdx;
-              setActiveChapter(nextIdx);
-            }
-          },
-        },
-      });
-
-      // Total timeline units = 20.0
-      // Background Wave Parallax Drift
-      if (backgroundWaveRef.current) {
-        masterTl.fromTo(
-          backgroundWaveRef.current,
-          { x: -50 },
-          { x: 50, ease: 'none', duration: 20 },
-          0
-        );
-      }
-
-      // Phase 0: Chapter 0 (0.0 -> 3.2)
+      // Continuous transcript feed scroll from arrival right through Chapter 0
       if (cardFeedRef.current) {
-        masterTl.fromTo(
+        gsap.fromTo(
           cardFeedRef.current,
           { y: 0 },
-          { y: -355, ease: 'power1.inOut', duration: 3.2 },
-          0
+          {
+            y: -355,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: track,
+              start: 'top bottom',
+              end: () => `+=${Math.round(window.innerHeight + track.offsetHeight * 0.2)}`,
+              scrub: 0.45,
+              invalidateOnRefresh: true,
+            },
+          }
         );
       }
-      if (mikelAvatarRef.current) {
-        masterTl.to(mikelAvatarRef.current, { scale: 1.08, duration: 0.8, ease: 'power1.out', yoyo: true, repeat: 1 }, 0.2);
-      }
-      if (stephenAvatarRef.current) {
-        masterTl.to(stephenAvatarRef.current, { scale: 1.08, duration: 0.8, ease: 'power1.out', yoyo: true, repeat: 1 }, 1.2);
-      }
-      if (bottomLeftPortraitRef.current) {
-        masterTl.to(bottomLeftPortraitRef.current, { scale: 1.08, duration: 0.8, ease: 'power1.out', yoyo: true, repeat: 1 }, 2.0);
-      }
 
-      // Transition 0 -> 1 (3.2 -> 4.2)
-      if (card0Ref.current) {
-        masterTl.to(card0Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 3.2);
-      }
-      if (copy0Ref.current) {
-        masterTl.to(copy0Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 3.2);
-      }
-      const avatars = [mikelAvatarRef.current, stephenAvatarRef.current, bottomLeftPortraitRef.current].filter(Boolean);
-      if (avatars.length) {
-        masterTl.to(avatars, { opacity: 0, scale: 0.8, ease: 'power2.inOut', duration: 0.8 }, 3.2);
-      }
-      if (card1Ref.current) {
-        masterTl.to(card1Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 3.2);
-      }
-      if (copy1Ref.current) {
-        masterTl.to(copy1Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 3.4);
-      }
-      if (navIndicatorRef.current) {
-        masterTl.to(navIndicatorRef.current, { y: 40, ease: 'power2.inOut', duration: 1.0 }, 3.2);
-      }
-
-      // Phase 1: Chapter 1 (4.2 -> 7.4)
-      if (chapter1InputTextRef.current) {
-        masterTl.to(
-          chapter1InputTextRef.current,
-          { maxWidth: '100%', ease: 'none', duration: 1.8 },
-          4.4
+      // Subtle diagonal ribbon parallax behind the pinned 3-column walkthrough
+      if (waveSvgRef.current) {
+        gsap.fromTo(
+          waveSvgRef.current,
+          { xPercent: -3.5, scale: 1 },
+          {
+            xPercent: 3.5,
+            scale: 1.04,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: track,
+              start: 'top top',
+              end: 'bottom bottom',
+              scrub: 0.5,
+            },
+          }
         );
       }
-      if (chapter1SentPillRef.current) {
-        masterTl.to(
-          chapter1SentPillRef.current,
-          { opacity: 1, y: 0, scale: 1, ease: 'back.out(1.2)', duration: 0.6 },
-          6.2
-        );
-      }
-      if (chapter1IllusRef.current) {
-        masterTl.to(
-          chapter1IllusRef.current,
-          { opacity: 0.15, scale: 0.92, y: -8, ease: 'power2.out', duration: 0.6 },
-          6.2
-        );
-      }
-      if (chapter1CursorRef.current) {
-        masterTl.to(chapter1CursorRef.current, { opacity: 0, duration: 0.2 }, 6.2);
-      }
 
-      // Transition 1 -> 2 (7.4 -> 8.4)
-      if (card1Ref.current) {
-        masterTl.to(card1Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 7.4);
-      }
-      if (copy1Ref.current) {
-        masterTl.to(copy1Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 7.4);
-      }
-      if (card2Ref.current) {
-        masterTl.to(card2Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 7.4);
-      }
-      if (copy2Ref.current) {
-        masterTl.to(copy2Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 7.6);
-      }
-      if (navIndicatorRef.current) {
-        masterTl.to(navIndicatorRef.current, { y: 80, ease: 'power2.inOut', duration: 1.0 }, 7.4);
-      }
-
-      // Phase 2: Chapter 2 (8.4 -> 11.6)
-      if (card2Ref.current) {
-        masterTl.to(card2Ref.current, { scale: 1.02, ease: 'power1.inOut', duration: 3.2 }, 8.4);
-      }
-
-      // Transition 2 -> 3 (11.6 -> 12.6)
-      if (card2Ref.current) {
-        masterTl.to(card2Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 11.6);
-      }
-      if (copy2Ref.current) {
-        masterTl.to(copy2Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 11.6);
-      }
-      if (card3Ref.current) {
-        masterTl.to(card3Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 11.6);
-      }
-      if (copy3Ref.current) {
-        masterTl.to(copy3Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 11.8);
-      }
-      if (navIndicatorRef.current) {
-        masterTl.to(navIndicatorRef.current, { y: 120, ease: 'power2.inOut', duration: 1.0 }, 11.6);
-      }
-
-      // Phase 3: Chapter 3 (12.6 -> 15.8)
-      if (card3Ref.current) {
-        masterTl.to(card3Ref.current, { scale: 1.02, ease: 'power1.inOut', duration: 3.2 }, 12.6);
-      }
-
-      // Transition 3 -> 4 (15.8 -> 16.8)
-      if (card3Ref.current) {
-        masterTl.to(card3Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 15.8);
-      }
-      if (copy3Ref.current) {
-        masterTl.to(copy3Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 15.8);
-      }
-      if (card4Ref.current) {
-        masterTl.to(card4Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 15.8);
-      }
-      if (copy4Ref.current) {
-        masterTl.to(copy4Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 16.0);
-      }
-      if (navIndicatorRef.current) {
-        masterTl.to(navIndicatorRef.current, { y: 160, ease: 'power2.inOut', duration: 1.0 }, 15.8);
-      }
-
-      // Phase 4: Chapter 4 (16.8 -> 20.0)
-      if (mcpPromptTextRef.current) {
-        masterTl.to(
-          mcpPromptTextRef.current,
-          { maxWidth: '100%', ease: 'none', duration: 2.0 },
-          17.0
-        );
-      }
+      ScrollTrigger.create({
+        trigger: track,
+        start: 'top top',
+        end: 'bottom bottom',
+        onUpdate: (self) => {
+          const p = self.progress;
+          const nextIdx =
+            p < 0.22 ? 0 : p < 0.42 ? 1 : p < 0.62 ? 2 : p < 0.82 ? 3 : 4;
+          if (nextIdx !== activeChapterRef.current) {
+            activeChapterRef.current = nextIdx;
+            setActiveChapter(nextIdx);
+          }
+        },
+      });
     });
 
     return () => {
@@ -616,7 +511,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
     }
     const trackTop = track.getBoundingClientRect().top + window.scrollY;
     const scrollable = Math.max(0, track.offsetHeight - window.innerHeight);
-    const targets = [0.08, 0.28, 0.50, 0.72, 0.92];
+    const targets = [0.06, 0.32, 0.52, 0.72, 0.92];
     const targetY = trackTop + scrollable * (targets[chapterIndex] ?? 0);
     activeChapterRef.current = chapterIndex;
     setActiveChapter(chapterIndex);
@@ -740,11 +635,12 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Right: 3-Layer Fanned Reminder / Capture Card */}
-            <div ref={heroCardRef} className="md:col-span-5 flex justify-center md:justify-end pb-1">
+            <div className="md:col-span-5 flex justify-center md:justify-end pb-1">
               <button
+                ref={heroFloatRef}
                 type="button"
                 onClick={() => setHeroScenarioIdx((prev) => (prev + 1) % HERO_SCENARIOS.length)}
-                className="relative w-full max-w-[28.5rem] text-left cursor-pointer group pt-5"
+                className="relative w-full max-w-[28.5rem] text-left cursor-pointer group pt-5 will-change-transform"
                 aria-label="Preview next captured action reminder"
               >
                 {/* Back Card 2 */}
@@ -798,12 +694,12 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       {/* 2 & 3. Unified Dark Quote -> Nested Emerald Capture Stage (rounded bottom seam matches video) */}
       <div
         ref={quoteSectionRef as React.RefObject<HTMLDivElement>}
-        className="bg-[#1a1a1a] text-[#ffffeb] rounded-[2.5rem] sm:rounded-[4.25rem] overflow-x-clip"
+        className="relative z-10 bg-[#1a1a1a] text-[#ffffeb] rounded-[2.5rem] sm:rounded-[4.25rem] overflow-x-clip"
       >
         {/* 2. Steven Bartlett Dark Quote Banner */}
         <section className="pt-20 sm:pt-28 pb-16 sm:pb-24 px-5">
           <Container>
-            <div className="max-w-[44rem] mx-auto text-center">
+            <div data-nt-quote className="max-w-[44rem] mx-auto text-center">
               <blockquote
                 className="font-display text-[1.6rem] sm:text-[2.25rem] lg:text-[2.55rem] leading-[1.15] tracking-[-0.02em] mb-8 text-[#ffffeb]"
                 style={{ textWrap: 'balance' }}
@@ -828,7 +724,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
           {/* Desktop Stage — exact match to reference composition */}
           <div className="hidden lg:flex items-center justify-center relative min-h-[46rem] xl:min-h-[48rem] w-full overflow-hidden">
             {/* Bubble 1 — Top-Right Foreground */}
-            <div data-bubble-fg data-bubble-right className="absolute top-[15.5%] left-[57%] z-20">
+            <div data-bubble-fg className="absolute top-[15.5%] left-[57%] z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#e8b354] mb-1.5">
                 Nathalie
               </div>
@@ -838,7 +734,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 2 — Upper-Left Recessed (behind "W" of headline) */}
-            <div data-bubble-bg data-bubble-left className="absolute top-[29%] left-[17.2%] z-10">
+            <div data-bubble-bg className="absolute top-[29%] left-[17.2%] z-10">
               <div className="text-[0.68rem] font-medium leading-none text-[#ffffeb]/25 mb-1.5">
                 Stephen
               </div>
@@ -848,7 +744,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 3 — Far-Left Edge Bleed */}
-            <div data-bubble-fg data-bubble-left className="absolute top-[45%] -left-2.5 z-20">
+            <div data-bubble-fg className="absolute top-[45%] -left-2.5 z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#e8b354] pl-1 mb-1.5">
                 Nathalie
               </div>
@@ -858,7 +754,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 4 — Far-Right Foreground */}
-            <div data-bubble-fg data-bubble-right className="absolute top-[38.5%] right-[3.7%] z-20">
+            <div data-bubble-fg className="absolute top-[38.5%] right-[3.7%] z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#d96b6b] mb-1.5">
                 Stephen
               </div>
@@ -879,7 +775,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </h2>
 
             {/* Bubble 5 — Lower-Left Foreground */}
-            <div data-bubble-fg data-bubble-left className="absolute top-[69%] left-[29%] z-20">
+            <div data-bubble-fg className="absolute top-[69%] left-[29%] z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#8ec5e8] mb-1.5">
                 Mikel
               </div>
@@ -889,7 +785,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 6 — Lower-Right Recessed */}
-            <div data-bubble-bg data-bubble-right className="absolute top-[62.5%] left-[56.8%] z-10">
+            <div data-bubble-bg className="absolute top-[62.5%] left-[56.8%] z-10">
               <div className="text-[0.68rem] font-medium leading-none text-[#ffffeb]/25 mb-1.5">
                 Stephen
               </div>
@@ -967,7 +863,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       </div>
 
       {/* 4. Cream Feature Walkthrough Section */}
-      <section className="bg-[#ffffeb] relative">
+      <section className="bg-[#ffffeb] relative z-20">
         {/* Intro Headline (glides cleanly behind the ascending transcript card) */}
         <div className="relative z-10 pt-20 sm:pt-28 pb-10 sm:pb-14 px-5">
           <Container>
@@ -984,123 +880,115 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
         </div>
 
         {/* Desktop Scroll-Choreographed Sticky 3-Column Feature Walkthrough */}
-        <div ref={walkthroughTrackRef} className="hidden lg:block relative z-30 h-[480vh]">
-          <div className="sticky top-0 h-screen overflow-hidden flex items-center">
-            {/* Subtle Background Diagonal Cream Ribbon Motif (visible across walkthrough stage) */}
-            <svg
-              viewBox="0 0 1440 720"
-              fill="none"
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-80"
-              preserveAspectRatio="none"
-            >
-              <path
-                ref={backgroundWaveRef}
-                d="M-120 440 C 260 440, 390 190, 740 190 C 1090 190, 1210 470, 1560 430"
-                stroke="#f2f0de"
-                strokeWidth="44"
-                strokeLinecap="round"
-              />
-            </svg>
+        <div ref={walkthroughTrackRef} className="hidden lg:block relative z-[35] h-[440vh]">
+          <div className="sticky top-0 h-screen flex items-center">
+            {/* Subtle Background Diagonal Cream Ribbon Motif (clipped cleanly to viewport) */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <svg
+                ref={waveSvgRef}
+                viewBox="0 0 1440 720"
+                fill="none"
+                aria-hidden="true"
+                className="w-full h-full object-cover opacity-85 will-change-transform"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M-120 440 C 260 440, 390 190, 740 190 C 1090 190, 1210 470, 1560 430"
+                  stroke="#f2f0de"
+                  strokeWidth="44"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
 
             <div className="max-w-[78rem] mx-auto px-8 w-full grid grid-cols-12 items-center gap-6 relative z-10">
               {/* Left Column: 5-Chapter Vertical Navigation (terracotta active accent) */}
-              <div ref={leftNavRef} className="col-span-3 relative flex flex-col items-start">
-                {/* Single terracotta indicator pill that smoothly slides along the active chapter */}
-                <div
-                  ref={navIndicatorRef}
-                  className="absolute left-0 w-[3px] h-5 bg-[#d84f32] rounded-full pointer-events-none"
-                  style={{
-                    transform: `translateY(${activeChapter * 40}px)`,
-                    transition: 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1)',
-                  }}
-                />
-                <div className="space-y-2.5 pl-3.5">
-                  {(
-                    [
-                      'The details',
-                      'Ask anything',
-                      'What did I miss?',
-                      'Summary',
-                      'MCP',
-                    ] as const
-                  ).map((label, idx) => {
-                    const isActive = activeChapter === idx;
-                    return (
-                      <button
-                        key={label}
-                        type="button"
-                        onClick={() => scrollToChapter(idx)}
-                        className={`block text-left text-[1.2rem] xl:text-[1.25rem] leading-[1.5] tracking-[-0.015em] transition-colors duration-200 cursor-pointer ${
-                          isActive
-                            ? 'text-[#1a1a1a] font-medium'
-                            : 'text-[#1a1a1a]/35 hover:text-[#1a1a1a]/70 font-normal'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
+              <div ref={leftNavRef} className="col-span-3 flex flex-col items-start space-y-1">
+                {(
+                  [
+                    'The details',
+                    'Ask anything',
+                    'What did I miss?',
+                    'Summary',
+                    'MCP',
+                  ] as const
+                ).map((label, idx) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => scrollToChapter(idx)}
+                    className={`text-left text-[1.22rem] leading-[1.68] tracking-[-0.015em] transition-colors duration-200 cursor-pointer ${
+                      activeChapter === idx
+                        ? 'text-[#d14c2e] font-medium'
+                        : 'text-[#1a1a1a]/30 hover:text-[#1a1a1a]/65 font-normal'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
 
               {/* Center Column: Uniform 27.5rem/29.5rem Square Morphing Stage */}
-              <div className="col-span-6 flex justify-center">
+              <div className="col-span-6 flex justify-center relative z-30">
                 <div
                   ref={floatingCardRef}
-                  className="w-[27.5rem] h-[27.5rem] xl:w-[29.5rem] xl:h-[29.5rem] relative"
+                  className="w-[27.5rem] h-[27.5rem] xl:w-[29.5rem] xl:h-[29.5rem] relative z-30"
                 >
-                  {/* Chapter 0: Cream-Beige Live Transcript Card */}
+                  {/* Chapter 0: Cream-Beige Live Transcript Card (absolute inset-0 keeps all chapters centered in the exact same square stage) */}
                   <div
-                    ref={card0Ref}
-                    className={`absolute inset-0 rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] px-6 pt-6 pb-4 w-full h-full flex flex-col justify-between ${
-                      activeChapter === 0 ? 'pointer-events-auto' : 'pointer-events-none'
+                    className={`absolute inset-0 w-full h-full rounded-[1.5rem] bg-[#e6e4d2] border border-[#1a1a1a]/[0.05] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] px-6 pt-6 pb-4 flex flex-col justify-between transition-all duration-300 ${
+                      activeChapter === 0
+                        ? 'opacity-100 scale-100 pointer-events-auto z-20'
+                        : 'opacity-0 scale-[0.97] pointer-events-none z-0'
                     }`}
                     aria-hidden={activeChapter !== 0}
                   >
-                    {/* Floating Portrait 1: Top-Right (Mikel) */}
+                    {/* Floating Portrait 1: Top-Right */}
                     <button
-                      ref={mikelAvatarRef}
+                      ref={topRightPortraitRef}
                       type="button"
                       onClick={() =>
                         setHighlightedSpeaker((prev) =>
-                          prev === 'mikel' ? null : 'mikel'
+                          prev === 'stephen' ? null : 'stephen'
                         )
                       }
-                      aria-label="Highlight Mikel lines"
-                      className={`absolute -top-7 -right-7 w-22 h-22 rounded-[1rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
-                        highlightedSpeaker === 'mikel' ? 'ring-2 ring-[#03473e]' : ''
-                      }`}
-                    >
-                      <img
-                        src={mikelImg}
-                        alt="Mikel"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-
-                    {/* Floating Portrait 2: Mid-Right (Stephen) */}
-                    <button
-                      ref={stephenAvatarRef}
-                      type="button"
-                      onClick={() =>
-                        setHighlightedSpeaker((prev) => (prev === 'stephen' ? null : 'stephen'))
-                      }
                       aria-label="Highlight Stephen lines"
-                      className={`absolute top-[34%] -right-8 w-22 h-22 rounded-[1rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
+                      className={`absolute -top-6 -right-8 w-24 h-24 rounded-[0.85rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
                         highlightedSpeaker === 'stephen' ? 'ring-2 ring-[#03473e]' : ''
                       }`}
                     >
                       <img
-                        src={stephenImg}
+                        src={daveImg}
                         alt="Stephen"
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-top"
                       />
                     </button>
 
-                    {/* Floating Portrait 3: Bottom-Left (Nathalie) */}
+                    {/* Floating Portrait 2: Mid-Right with coral pill tag */}
+                    <button
+                      ref={midRightPortraitRef}
+                      type="button"
+                      onClick={() =>
+                        setHighlightedSpeaker((prev) => (prev === 'mikel' ? null : 'mikel'))
+                      }
+                      aria-label="Highlight Mikel lines"
+                      className={`absolute top-[37%] -right-9 w-24 h-24 rounded-[0.85rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
+                        highlightedSpeaker === 'mikel' ? 'ring-2 ring-[#03473e]' : ''
+                      }`}
+                    >
+                      <img
+                        src={alexImg}
+                        alt="Mikel"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-top"
+                      />
+                      <span className="absolute bottom-1.5 left-1.5 rounded-full bg-[#e07a7a] text-[#ffffeb] text-[0.6rem] font-semibold px-2 py-0.5 leading-none shadow-xs">
+                        Mikel
+                      </span>
+                    </button>
+
+                    {/* Floating Portrait 3: Bottom-Left with warm amber pill tag */}
                     <button
                       ref={bottomLeftPortraitRef}
                       type="button"
@@ -1110,16 +998,19 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                         )
                       }
                       aria-label="Highlight Nathalie lines"
-                      className={`absolute bottom-[10%] -left-8 w-22 h-22 rounded-[1rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
+                      className={`absolute bottom-[10%] -left-9 w-24 h-24 rounded-[0.85rem] overflow-hidden shadow-[0_14px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 cursor-pointer z-20 ${
                         highlightedSpeaker === 'nathalie' ? 'ring-2 ring-[#03473e]' : ''
                       }`}
                     >
                       <img
-                        src={nathalieImg}
+                        src={elenaImg}
                         alt="Nathalie"
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-top"
                       />
+                      <span className="absolute bottom-1.5 left-1.5 rounded-full bg-[#e8b354] text-[#1a1a1a] text-[0.6rem] font-semibold px-2 py-0.5 leading-none shadow-xs">
+                        Nathalie
+                      </span>
                     </button>
 
                     {/* Inner Scrollable Transcript Viewport with Top/Bottom Gradient Fade */}
@@ -1166,243 +1057,623 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
 
                     {/* Bottom-Center Emerald Waveform Pill */}
                     <div ref={waveformPillRef} className="flex justify-center pt-2 shrink-0">
-                      <div className="inline-flex items-center justify-center rounded-full bg-[#1a1a1a] text-[#34d399] px-4 py-1.5 shadow-md">
-                        <span className="flex items-center gap-1">
-                          <span className="w-1 h-3 rounded-full bg-[#34d399] animate-pulse" />
-                          <span className="w-1 h-4 rounded-full bg-[#34d399]" />
-                          <span className="w-1 h-2 rounded-full bg-[#34d399]" />
-                          <span className="w-1.5 h-1.5 rounded-sm bg-[#34d399] ml-1" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Chapter 1: Ask anything — Spot Illustration + Typing Prompt -> Sent Pill */}
-                  <div
-                    ref={card1Ref}
-                    className={`absolute inset-0 rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] p-6 flex flex-col justify-between overflow-hidden text-left ${
-                      activeChapter === 1 ? 'pointer-events-auto' : 'pointer-events-none'
-                    }`}
-                    aria-hidden={activeChapter !== 1}
-                  >
-                    {/* Top: Sent Question Pill */}
-                    <div className="min-h-[2.5rem] flex flex-col items-end gap-2 z-10 w-full">
-                      <div
-                        ref={chapter1SentPillRef}
-                        className="rounded-full bg-[#1a1a1a] text-[#ffffeb] px-4 py-2 text-xs font-medium shadow-md self-end"
-                      >
-                        {window1AnswerNote ? 'Your question' : "What's blocking the launch this week?"}
-                      </div>
-                    </div>
-
-                    {/* Center Spot Illustration */}
-                    <div
-                      ref={chapter1IllusRef}
-                      className="flex flex-col items-center justify-center text-center my-auto transition-transform duration-300"
-                    >
-                      <img
-                        src={askAnythingIllus}
-                        alt="Ask anything about your meetings"
-                        className="w-24 h-20 object-contain mb-3 drop-shadow-xs"
-                      />
-                      <p className="font-display text-[1.25rem] leading-[1.18] text-[#1a1a1a]">
-                        Ask anything about
-                        <br />
-                        <em className="italic font-normal">your meetings</em>
-                      </p>
-                    </div>
-
-                    {/* Bottom Prompt Composer with Typing Simulation */}
-                    <form
-                      onSubmit={handleWindow1Ask}
-                      className="rounded-full bg-[#ffffff] border border-[#1a1a1a]/10 px-5 py-3 flex items-center justify-between shadow-xs z-10 w-full"
-                    >
-                      <div className="flex-1 flex items-center overflow-hidden min-h-[1.25rem]">
-                        <span
-                          ref={chapter1InputTextRef}
-                          className="inline-block whitespace-nowrap overflow-hidden text-xs text-[#1a1a1a]"
-                        >
-                          What&apos;s blocking the launch this week?
-                        </span>
-                        <span
-                          ref={chapter1CursorRef}
-                          className="inline-block w-0.5 h-3.5 bg-[#1a1a1a] ml-0.5 animate-pulse shrink-0"
-                        />
-                      </div>
                       <button
-                        type="submit"
-                        aria-label="Send question"
-                        className="w-5 h-5 rounded-full bg-[#1a1a1a]/10 hover:bg-[#1a1a1a] text-[#1a1a1a] hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
+                        type="button"
+                        onClick={() => setHighlightedSpeaker(null)}
+                        title="Show all speakers"
+                        className="inline-flex items-center justify-center rounded-lg bg-[#03473e] text-[#ffffeb] px-3.5 py-2 shadow-md hover:opacity-90 transition-opacity cursor-pointer"
                       >
-                        <ArrowRight className="w-2.5 h-2.5" />
+                        <FlowWaveformMark className="w-4 h-3.5" />
                       </button>
-                    </form>
-                  </div>
-
-                  {/* Chapter 2: What did I miss? */}
-                  <div
-                    ref={card2Ref}
-                    className={`absolute inset-0 rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden flex items-center justify-center ${
-                      activeChapter === 2 ? 'pointer-events-auto' : 'pointer-events-none'
-                    }`}
-                    aria-hidden={activeChapter !== 2}
-                  >
-                    <img
-                      src={ipadTranscriptImg}
-                      alt="What did I miss transcript"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Chapter 3: Summary */}
-                  <div
-                    ref={card3Ref}
-                    className={`absolute inset-0 rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden flex items-center justify-center ${
-                      activeChapter === 3 ? 'pointer-events-auto' : 'pointer-events-none'
-                    }`}
-                    aria-hidden={activeChapter !== 3}
-                  >
-                    <img
-                      src={ipadSummaryImg}
-                      alt="Generating Flow Summary"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Chapter 4: MCP */}
-                  <div
-                    ref={card4Ref}
-                    className={`absolute inset-0 rounded-[1.5rem] bg-[#161616] text-[#ffffeb] p-7 flex flex-col justify-between items-center text-center shadow-2xl overflow-hidden ${
-                      activeChapter === 4 ? 'pointer-events-auto' : 'pointer-events-none'
-                    }`}
-                    aria-hidden={activeChapter !== 4}
-                  >
-                    {/* Claude 8-pointed star / asterisk */}
-                    <div className="pt-1 text-white font-serif text-3xl select-none">
-                      ✹
                     </div>
+                  </div>
 
-                    <div className="w-full space-y-4">
-                      <h4 className="font-sans font-bold text-xl sm:text-2xl text-[#ffffff]">
-                        What should we work on?
-                      </h4>
+                  <div
+                    className={`absolute inset-0 w-full h-full z-20 ${
+                      activeChapter === 0 ? 'pointer-events-none' : 'pointer-events-auto'
+                    }`}
+                  >
+                    <AnimatePresence mode="wait">
+                      {activeChapter === 1 && (
+                        /* Chapter 1: Ask anything — Spot Illustration + Discrete Smooth Prompt Reveal -> Sent Pill */
+                        <motion.div
+                          key="chapter-ask"
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.28 }}
+                          className="w-full h-full rounded-[1.5rem] bg-[#e6e4d2] border border-[#1a1a1a]/[0.05] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] p-6 flex flex-col justify-between relative overflow-hidden text-left"
+                        >
+                          {(() => {
+                            const fullQ = "What's blocking the launch this week?";
+                            const sent = askPhase >= 2 || Boolean(window1AnswerNote);
+                            return (
+                              <>
+                                {/* Sent Question Pill + AI Response when sent */}
+                                <div className="min-h-[2.25rem] flex flex-col items-end gap-2 z-10">
+                                  {sent && (
+                                    <motion.div
+                                      initial={{ opacity: 0, y: 14, scale: 0.95 }}
+                                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                                      className="rounded-xl bg-[#1a1a1a] text-[#ffffeb] px-3.5 py-2 text-xs font-medium shadow-md"
+                                    >
+                                      {window1AnswerNote ? 'Your question' : fullQ}
+                                    </motion.div>
+                                  )}
+                                  {sent && (
+                                    <motion.div
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ delay: 0.14, duration: 0.35 }}
+                                      className="w-full rounded-xl bg-[#ffffeb]/95 border border-[#1a1a1a]/10 p-3.5 text-[0.74rem] text-[#1a1a1a]/85 leading-relaxed shadow-sm space-y-1.5"
+                                    >
+                                      {window1AnswerNote ? (
+                                        <p>{window1AnswerNote}</p>
+                                      ) : (
+                                        <>
+                                          <p className="font-medium text-[#1a1a1a]">
+                                            I searched through your meetings and notes and found three potential launch blockers that people have mentioned:
+                                          </p>
+                                          <ul className="space-y-1 list-disc list-inside text-[0.71rem]">
+                                            <li>
+                                              <strong>Cheng Liu</strong> returns Oct 21 for final asset sign-off.
+                                            </li>
+                                            <li>
+                                              <strong>Mobile checkout fix</strong> ships to staging Thursday.
+                                            </li>
+                                          </ul>
+                                          <div className="pt-1 text-[0.65rem] font-semibold text-[#03473e]">
+                                            Sources: Marketing Standup · Q3 Campaign Sync
+                                          </div>
+                                        </>
+                                      )}
+                                    </motion.div>
+                                  )}
+                                </div>
 
-                      <div className="rounded-2xl bg-[#242424] border border-white/5 p-4 text-left relative min-h-[5.5rem] flex flex-col justify-between">
-                        <div className="text-xs text-[#ffffff]/90 leading-relaxed font-sans overflow-hidden whitespace-nowrap flex items-center">
-                          <span
-                            ref={mcpPromptTextRef}
-                            className="inline-block whitespace-nowrap overflow-hidden"
+                                {/* Center Editorial Magnifying Glass Illustration */}
+                                <div
+                                  className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center transition-all duration-400 px-6 ${
+                                    sent ? 'opacity-10 scale-90 -translate-y-2' : 'opacity-100 scale-100'
+                                  }`}
+                                >
+                                  <svg
+                                    viewBox="0 0 110 96"
+                                    className="w-24 h-20 mb-2"
+                                    fill="none"
+                                    aria-hidden="true"
+                                  >
+                                    {/* Botanical Leaves */}
+                                    <path
+                                      d="M66 56 C78 46, 86 30, 82 18 C70 22, 62 38, 66 56 Z"
+                                      fill="#4aa96c"
+                                    />
+                                    <path
+                                      d="M68 58 C82 54, 96 44, 98 32 C84 30, 72 42, 68 58 Z"
+                                      fill="#2d6a4f"
+                                    />
+                                    {/* Document Card */}
+                                    <rect
+                                      x="30"
+                                      y="24"
+                                      width="42"
+                                      height="50"
+                                      rx="5"
+                                      fill="#f0d7ff"
+                                      stroke="#1a1a1a"
+                                      strokeWidth="2"
+                                    />
+                                    <line x1="38" y1="36" x2="62" y2="36" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" />
+                                    <line x1="38" y1="45" x2="58" y2="45" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" />
+                                    <line x1="38" y1="54" x2="54" y2="54" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" />
+                                    {/* Magnifying Glass */}
+                                    <circle
+                                      cx="47"
+                                      cy="34"
+                                      r="14"
+                                      fill="#ffffeb"
+                                      fillOpacity="0.88"
+                                      stroke="#ffa946"
+                                      strokeWidth="3.5"
+                                    />
+                                    <line
+                                      x1="37"
+                                      y1="44"
+                                      x2="26"
+                                      y2="56"
+                                      stroke="#1a1a1a"
+                                      strokeWidth="4"
+                                      strokeLinecap="round"
+                                    />
+                                  </svg>
+                                  <p className="font-display text-[1.15rem] leading-tight text-[#1a1a1a]/80">
+                                    Ask anything about
+                                    <br />
+                                    your meetings
+                                  </p>
+                                </div>
+
+                                {/* Bottom Prompt Composer with Smooth Clip Reveal */}
+                                <form
+                                  onSubmit={handleWindow1Ask}
+                                  className="rounded-xl bg-[#ffffeb] border border-[#1a1a1a]/12 px-3.5 py-2.5 flex items-center gap-2 shadow-sm z-10 relative"
+                                >
+                                  <div className="flex-1 relative flex items-center overflow-hidden min-h-[1.25rem]">
+                                    <input
+                                      type="text"
+                                      value={window1Input}
+                                      onChange={(e) => setWindow1Input(e.target.value)}
+                                      placeholder={askPhase === 1 ? '' : 'Ask anything'}
+                                      className="w-full bg-transparent text-xs text-[#1a1a1a] placeholder:text-[#1a1a1a]/45 focus:outline-none"
+                                    />
+                                    {!window1Input && askPhase === 1 && (
+                                      <motion.span
+                                        initial={{ clipPath: 'inset(0 100% 0 0)' }}
+                                        animate={{ clipPath: 'inset(0 0% 0 0)' }}
+                                        transition={{ duration: 0.65, ease: 'easeOut' }}
+                                        className="pointer-events-none absolute inset-y-0 left-0 flex items-center text-xs text-[#1a1a1a] whitespace-nowrap"
+                                      >
+                                        {fullQ}
+                                      </motion.span>
+                                    )}
+                                  </div>
+                                  <button
+                                    type="submit"
+                                    aria-label="Send question"
+                                    className={`w-6 h-6 rounded-full bg-[#1a1a1a] text-[#ffffeb] flex items-center justify-center transition-transform duration-200 cursor-pointer shrink-0 ${
+                                      askPhase === 1 ? 'scale-110 ring-2 ring-[#ffa946]/70' : 'hover:opacity-85'
+                                    }`}
+                                  >
+                                    <Send className="w-3 h-3" />
+                                  </button>
+                                </form>
+                              </>
+                            );
+                          })()}
+                        </motion.div>
+                      )}
+
+                      {activeChapter === 2 && (
+                        /* Chapter 2: What did I miss? — Zoom-Out Tablet Showcase + Auto Recap Drawer */
+                        <motion.div
+                          key="chapter-missed"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.28 }}
+                          className="w-full h-full rounded-[1.5rem] bg-[#141414] p-2.5 shadow-2xl overflow-hidden text-left"
+                        >
+                          <motion.div
+                            initial={{ scale: 1.32, x: -32, y: -24 }}
+                            animate={{ scale: 1, x: 0, y: 0 }}
+                            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+                            className="w-full h-full rounded-[1.15rem] bg-[#ffffff] text-[#1a1a1a] p-4 flex flex-col justify-between overflow-hidden relative"
                           >
-                            Use the last week of meetings to draft the roadmap
-                          </span>
-                          <span
-                            ref={mcpCursorRef}
-                            className="inline-block w-0.5 h-3 bg-white ml-0.5 animate-pulse shrink-0"
+                            <div>
+                              <div className="flex items-center justify-between text-[0.65rem] text-[#1a1a1a]/45 mb-2">
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                                  <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
+                                  <span className="w-2 h-2 rounded-full bg-[#28c840]" />
+                                </div>
+                                <span>20 Feb 2026</span>
+                              </div>
+                              <div className="font-display text-lg mb-2">
+                                Q3 Campaign Planning
+                              </div>
+                              <div className="flex items-center gap-1.5 border-b border-[#1a1a1a]/10 pb-2 mb-3 text-[0.68rem]">
+                                {(
+                                  [
+                                    { id: 'insights', label: 'My Thoughts' },
+                                    { id: 'transcript', label: 'Transcript' },
+                                    { id: 'summary', label: 'Summary' },
+                                  ] as const
+                                ).map((t) => (
+                                  <button
+                                    key={t.id}
+                                    type="button"
+                                    onClick={() => setWindow2Tab(t.id)}
+                                    className={`px-2 py-0.5 rounded font-medium cursor-pointer transition-colors ${
+                                      window2Tab === t.id
+                                        ? 'bg-[#e6e4d2] text-[#1a1a1a]'
+                                        : 'text-[#1a1a1a]/55 hover:text-[#1a1a1a]'
+                                    }`}
+                                  >
+                                    {t.label}
+                                  </button>
+                                ))}
+                              </div>
+
+                              <AnimatePresence>
+                                {catchUpOpen && (
+                                  <motion.div
+                                    initial={{ opacity: 0, y: 14, scale: 0.97 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                                    transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+                                    className="mb-2.5 rounded-xl bg-[#1a1a1a]/92 backdrop-blur-md border border-[#1a1a1a]/15 p-3 text-[0.66rem] text-[#ffffeb] shadow-lg space-y-1.5"
+                                  >
+                                    <div className="flex items-center justify-between text-[#cef5ca] font-semibold">
+                                      <span>Your five focus areas, in priority order:</span>
+                                      <span className="text-[0.6rem] text-[#ffffeb]/60 font-normal">
+                                        Last 5 min
+                                      </span>
+                                    </div>
+                                    <ol className="space-y-0.5 text-[#ffffeb]/85 list-decimal list-inside leading-snug">
+                                      <li>Budget modification — shift 20% paid spend</li>
+                                      <li>Q3 creative plan &amp; loyalty offer test</li>
+                                      <li>Channel strategy &amp; analytics sign-off</li>
+                                    </ol>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+
+                              <div className="space-y-2.5 text-[0.7rem] leading-snug text-[#1a1a1a]/80">
+                                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f4f2e4] px-2.5 py-1 text-[0.62rem] font-mono text-[#1a1a1a]/70">
+                                  <FlowWaveformMark className="w-3 h-2.5 text-[#03473e]" />
+                                  <span>28:32</span>
+                                </div>
+                                <div>
+                                  <div className="text-[0.62rem] text-[#1a1a1a]/45 mb-0.5">Stephen</div>
+                                  <p>Where are we landing on the budget?</p>
+                                </div>
+                                <div>
+                                  <div className="text-[0.62rem] text-[#e59a38] mb-0.5">Nathalie</div>
+                                  <p>
+                                    My team wants to cut paid social spend by 20% and reallocate. Let&apos;s confirm channel ROI first.
+                                  </p>
+                                </div>
+                                {!catchUpOpen && (
+                                  <div>
+                                    <div className="text-[0.62rem] text-[#5b9bd5] mb-0.5">Mikel</div>
+                                    <p>What about testing the loyalty offer next week?</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-[#1a1a1a]/8">
+                              <span className="text-[0.66rem] text-[#1a1a1a]/40">Ask anything...</span>
+                              <button
+                                type="button"
+                                onClick={() => setCatchUpOpen((v) => !v)}
+                                className={`relative inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[0.66rem] font-semibold transition-all cursor-pointer shadow-xs ${
+                                  catchUpOpen
+                                    ? 'bg-[#03473e] text-[#ffffeb] border-[#03473e]'
+                                    : catchUpPulse
+                                    ? 'bg-[#cef5ca] text-[#1a1a1a] border-[#03473e] ring-4 ring-[#cef5ca]/70 scale-95'
+                                    : 'bg-[#ffffeb] text-[#1a1a1a] border-[#1a1a1a]/15 hover:bg-[#cef5ca]'
+                                }`}
+                              >
+                                <Sparkles className={`w-2.5 h-2.5 ${catchUpOpen ? 'text-[#cef5ca]' : 'text-[#03473e]'}`} />
+                                <span>What did I miss?</span>
+                              </button>
+                            </div>
+                          </motion.div>
+                        </motion.div>
+                      )}
+
+                      {activeChapter === 3 && (
+                        /* Chapter 3: Summary — Atmospheric Photo Backdrop + "Generating Flow Summary..." -> Structured Bullets */
+                        <motion.div
+                          key="chapter-summary"
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.28 }}
+                          className="w-full h-full rounded-[1.5rem] overflow-hidden relative p-5 flex items-center justify-center shadow-2xl text-left"
+                        >
+                          <img
+                            src={atmosphereImg}
+                            alt=""
+                            className="absolute inset-0 w-full h-full object-cover scale-105"
                           />
-                        </div>
-                        <div className="flex justify-end pt-2">
-                          <button
-                            type="button"
-                            aria-label="Submit"
-                            className="w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-                          >
-                            <span className="w-2 h-2 rounded-xs bg-white" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                          <div className="absolute inset-0 bg-[#1a120d]/45 backdrop-blur-[2px]" />
 
-                    {/* Bottom waveform capsule matching video */}
-                    <div className="inline-flex items-center justify-center rounded-full bg-[#242424] border border-white/10 px-4 py-1.5 shadow-md">
-                      <span className="flex items-center gap-1">
-                        <span className="w-0.5 h-2 rounded-full bg-white/80" />
-                        <span className="w-0.5 h-3.5 rounded-full bg-white" />
-                        <span className="w-0.5 h-2 rounded-full bg-white/80" />
-                        <span className="w-0.5 h-1.5 rounded-full bg-white/60" />
-                        <span className="w-0.5 h-3 rounded-full bg-white" />
-                        <span className="w-0.5 h-2 rounded-full bg-white/80" />
-                      </span>
-                    </div>
+                          <div className="relative z-10 w-full h-full rounded-xl bg-[#ffffff] text-[#1a1a1a] p-4 shadow-2xl flex flex-col justify-between overflow-hidden">
+                            <div>
+                              <div className="flex items-center justify-between text-[0.65rem] text-[#1a1a1a]/45 mb-2">
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                                  <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
+                                  <span className="w-2 h-2 rounded-full bg-[#28c840]" />
+                                </div>
+                                <span>Enhanced Note</span>
+                              </div>
+                              <div className="font-display text-lg mb-2">
+                                Q3 Campaign Planning
+                              </div>
+                              <div className="flex items-center gap-1.5 border-b border-[#1a1a1a]/10 pb-2 mb-3 text-[0.66rem]">
+                                <span className="px-2 py-0.5 rounded bg-[#f4f2e4] font-semibold">
+                                  Summary
+                                </span>
+                                <span className="text-[#1a1a1a]/45">Transcript</span>
+                              </div>
+
+                              <AnimatePresence mode="wait">
+                                {summaryStep < 4 ? (
+                                  <motion.div
+                                    key="summary-generating"
+                                    initial={{ opacity: 0, y: 4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -6 }}
+                                    transition={{ duration: 0.25 }}
+                                    className="rounded-lg bg-[#faf9f2] border border-[#1a1a1a]/8 p-3 space-y-2.5"
+                                  >
+                                    <div className="flex items-center gap-1.5 text-[0.62rem] font-semibold uppercase tracking-wider text-[#03473e]">
+                                      <Sparkles className="w-3 h-3" />
+                                      <span>ENHANCED SUMMARY</span>
+                                    </div>
+                                    <div className="text-xs font-semibold text-[#1a1a1a]">
+                                      {summaryStep < 3
+                                        ? 'Generating Flow Summary...'
+                                        : 'Summary ready'}
+                                    </div>
+
+                                    <div className="space-y-2 text-[0.7rem] text-[#1a1a1a]/80">
+                                      {[
+                                        'Building comprehensive contextual summary',
+                                        'Mapping out dependencies and blockers',
+                                        'Consolidating action items with owners',
+                                      ].map((stepLabel, sIdx) => {
+                                        const done = summaryStep > sIdx;
+                                        const current = summaryStep === sIdx;
+                                        return (
+                                          <div
+                                            key={stepLabel}
+                                            className={`flex items-center gap-2 transition-opacity duration-300 ${
+                                              done || current ? 'opacity-100' : 'opacity-35'
+                                            }`}
+                                          >
+                                            <span
+                                              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[0.55rem] font-bold shrink-0 ${
+                                                done
+                                                  ? 'bg-[#03473e] text-[#ffffeb]'
+                                                  : current
+                                                  ? 'bg-[#ffa946] text-[#1a1a1a]'
+                                                  : 'bg-[#1a1a1a]/15 text-[#1a1a1a]/50'
+                                              }`}
+                                            >
+                                              {done ? '✓' : '•'}
+                                            </span>
+                                            <span className={done ? 'font-medium text-[#1a1a1a]' : ''}>
+                                              {stepLabel}
+                                            </span>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </motion.div>
+                                ) : (
+                                  <motion.div
+                                    key="summary-bullets"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                                    className="space-y-2.5 text-[0.68rem] text-[#1a1a1a]/85 leading-snug"
+                                  >
+                                    <div>
+                                      <div className="text-[0.64rem] font-bold uppercase tracking-wider text-[#03473e] mb-1">
+                                        Creative Direction
+                                      </div>
+                                      <ul className="space-y-1 list-disc list-inside">
+                                        <li>Siobhan reviews final Miro layout on Tuesday.</li>
+                                        <li>Raphael owns design QA sign-off this sprint.</li>
+                                      </ul>
+                                    </div>
+                                    <div>
+                                      <div className="text-[0.64rem] font-bold uppercase tracking-wider text-[#03473e] mb-1">
+                                        Channel Strategy
+                                      </div>
+                                      <ul className="space-y-1 list-disc list-inside">
+                                        <li>Reallocate 20% paid spend pending ROI check.</li>
+                                        <li>Route ad-hoc updates through Asana &amp; Tableau.</li>
+                                      </ul>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+
+                            {/* Interactive Topic Tabs once ready */}
+                            <div className="pt-2 border-t border-[#1a1a1a]/8 flex items-center justify-between text-[0.65rem]">
+                              <div className="flex gap-1">
+                                {(['timelines', 'decisions', 'next-steps'] as const).map((t) => (
+                                  <button
+                                    key={t}
+                                    type="button"
+                                    onClick={() => setActiveSummaryChapter(t)}
+                                    className={`px-2 py-0.5 rounded capitalize cursor-pointer ${
+                                      activeSummaryChapter === t
+                                        ? 'bg-[#1a1a1a] text-[#ffffeb] font-semibold'
+                                        : 'text-[#1a1a1a]/55 hover:text-[#1a1a1a]'
+                                    }`}
+                                  >
+                                    {t.replace('-', ' ')}
+                                  </button>
+                                ))}
+                              </div>
+                              <span className="text-[#03473e] font-semibold">
+                                {activeSummaryChapter === 'timelines'
+                                  ? 'Oct 21 · QA'
+                                  : activeSummaryChapter === 'decisions'
+                                  ? 'Asana + Tableau'
+                                  : '3 owners'}
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {activeChapter === 4 && (
+                        /* Chapter 4: MCP — Solid Obsidian "What should we work on?" Prompt Window */
+                        <motion.div
+                          key="chapter-mcp"
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.28 }}
+                          className="w-full h-full rounded-[1.5rem] bg-[#111111] text-[#ffffeb] p-7 flex flex-col justify-between items-center text-center shadow-2xl"
+                        >
+                          <motion.div
+                            animate={{ opacity: [0.35, 0.8, 0.35], scale: [1, 1.08, 1] }}
+                            transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+                            className="pt-2 text-[#ffffeb]/55"
+                          >
+                            <Sparkles className="w-5 h-5 mx-auto" />
+                          </motion.div>
+
+                          <div className="w-full space-y-4">
+                            <h4 className="font-display text-2xl sm:text-[1.85rem] leading-tight text-[#ffffeb]">
+                              What should we work on?
+                            </h4>
+
+                            {(() => {
+                              const selected =
+                                MCP_TOOLS.find((m) => m.id === activeMcpTool) || MCP_TOOLS[0];
+                              const samplePrompt = `Use the last meeting to draft follow-ups in ${selected.name}...`;
+                              return (
+                                <div className="rounded-xl bg-[#1b1b1b] border border-white/10 p-4 text-left space-y-3">
+                                  <div className="min-h-[3.5rem] text-xs text-[#ffffeb]/85 leading-relaxed relative overflow-hidden">
+                                    {mcpPhase === 0 ? (
+                                      <span className="text-[#ffffeb]/40">
+                                        Write a message...
+                                      </span>
+                                    ) : (
+                                      <motion.span
+                                        key={selected.id}
+                                        initial={{ opacity: 0, y: 4 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                                        className="block"
+                                      >
+                                        {samplePrompt}
+                                      </motion.span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center justify-between pt-1">
+                                    <div className="flex items-center gap-1">
+                                      {MCP_TOOLS.map((tool) => (
+                                        <button
+                                          key={tool.id}
+                                          type="button"
+                                          onClick={() => setActiveMcpTool(tool.id)}
+                                          className={`px-2 py-0.5 rounded text-[0.65rem] font-medium transition-colors cursor-pointer ${
+                                            activeMcpTool === tool.id
+                                              ? 'bg-[#ffffeb] text-[#111111]'
+                                              : 'bg-white/10 text-[#ffffeb]/65 hover:text-[#ffffeb]'
+                                          }`}
+                                        >
+                                          {tool.name}
+                                        </button>
+                                      ))}
+                                    </div>
+                                    <span className="w-5 h-5 rounded-full bg-[#ffffeb] text-[#111111] flex items-center justify-center">
+                                      <ArrowRight className="w-3 h-3" />
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+
+                          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[0.7rem] font-medium text-[#ffffeb]/75">
+                            <FlowWaveformMark className="w-3.5 h-3" />
+                            <span>MCP Connected</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
 
               {/* Right Column: Active Feature Headline & Editorial Copy */}
-              <div ref={rightCopyRef} className="col-span-3 pl-2 text-left relative min-h-[14rem]">
-                {/* Chapter 0 Copy */}
-                <div
-                  ref={copy0Ref}
-                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
-                    activeChapter === 0 ? 'pointer-events-auto' : 'pointer-events-none'
-                  }`}
-                >
-                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                    Get the details right.
-                  </h3>
-                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                    From uncommon names to industry jargon, Wispr&apos;s notetaking AI uses your dictionary and calendar to help capture the details that matter in your meeting transcript and summary.
-                  </p>
-                </div>
-
-                {/* Chapter 1 Copy */}
-                <div
-                  ref={copy1Ref}
-                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
-                    activeChapter === 1 ? 'pointer-events-auto' : 'pointer-events-none'
-                  }`}
-                >
-                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                    Stop digging. <em className="italic font-normal">Just ask.</em>
-                  </h3>
-                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                    Notetaker&apos;s AI searches across your prior meeting notes and the web for the answer, then links you to the source.
-                  </p>
-                </div>
-
-                {/* Chapter 2 Copy */}
-                <div
-                  ref={copy2Ref}
-                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
-                    activeChapter === 2 ? 'pointer-events-auto' : 'pointer-events-none'
-                  }`}
-                >
-                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                    Zoned out? <em className="italic font-normal">Catch up</em> in seconds.
-                  </h3>
-                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                    No more &quot;sorry, can you repeat that?&quot; Tap &quot;What did I miss?&quot; and Notetaker gives you a summary of the last few minutes. You&apos;re caught up before anyone notices.
-                  </p>
-                </div>
-
-                {/* Chapter 3 Copy */}
-                <div
-                  ref={copy3Ref}
-                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
-                    activeChapter === 3 ? 'pointer-events-auto' : 'pointer-events-none'
-                  }`}
-                >
-                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                    Get a summary <em className="italic font-normal">you&apos;ll actually read.</em>
-                  </h3>
-                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                    Our AI notetaker pulls out timelines, decisions, and next steps, then organizes everything by topic so you can find what matters.
-                  </p>
-                </div>
-
-                {/* Chapter 4 Copy */}
-                <div
-                  ref={copy4Ref}
-                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
-                    activeChapter === 4 ? 'pointer-events-auto' : 'pointer-events-none'
-                  }`}
-                >
-                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                    Connect to all your AI tools.
-                  </h3>
-                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                    Bring your meeting history into Claude, ChatGPT, Gemini, or any tool that supports MCP. Put your meeting notes to work alongside your docs and projects. No copy-paste required.
-                  </p>
-                </div>
+              <div ref={rightCopyRef} className="col-span-3 pl-2 text-left">
+                <AnimatePresence mode="wait">
+                  {activeChapter === 0 && (
+                    <motion.div
+                      key="copy-0"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.24 }}
+                    >
+                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                        Get the <em className="italic font-normal">details</em> right.
+                      </h3>
+                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                        From uncommon names to industry jargon, Wispr&apos;s notetaking AI uses your dictionary and calendar to help capture the details that matter in your meeting transcript and summary.
+                      </p>
+                    </motion.div>
+                  )}
+                  {activeChapter === 1 && (
+                    <motion.div
+                      key="copy-1"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.24 }}
+                    >
+                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                        Stop digging. <em className="italic font-normal">Just ask.</em>
+                      </h3>
+                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                        Notetaker&apos;s AI searches across your prior meeting notes and the web for the answer, then links you to the source.
+                      </p>
+                    </motion.div>
+                  )}
+                  {activeChapter === 2 && (
+                    <motion.div
+                      key="copy-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.24 }}
+                    >
+                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                        Zoned out? <em className="italic font-normal">Catch up</em> in seconds.
+                      </h3>
+                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                        No more &quot;sorry, can you repeat that?&quot; Tap &quot;What did I miss?&quot; and Notetaker gives you a summary of the last five minutes. You&apos;re caught up before anyone notices.
+                      </p>
+                    </motion.div>
+                  )}
+                  {activeChapter === 3 && (
+                    <motion.div
+                      key="copy-3"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.24 }}
+                    >
+                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                        Get a summary <em className="italic font-normal">you&apos;ll actually read.</em>
+                      </h3>
+                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                        Our AI notetaker pulls out timelines, decisions, and next steps, then organizes everything by topic so you can find what matters.
+                      </p>
+                    </motion.div>
+                  )}
+                  {activeChapter === 4 && (
+                    <motion.div
+                      key="copy-4"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.24 }}
+                    >
+                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                        Connect to <em className="italic font-normal">all</em> your AI tools.
+                      </h3>
+                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                        Bring your meeting history into Claude, ChatGPT, Gemini, or any tool that supports MCP. Put your meeting notes to work alongside your docs and projects. No copy-paste required.
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -1615,13 +1886,13 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
         </div>
       </section>
 
-      {/* 5. Three-Column Illustrated Workflow Section matching screenshot */}
-      <section className="pt-24 sm:pt-32 pb-24 sm:pb-32 bg-[#ffffeb]">
+      {/* 5. Three-Column Illustrated Workflow Section */}
+      <section className="py-20 sm:py-28 bg-[#ffffeb]">
         <Container>
-          <div ref={workflowRef} className="max-w-3xl mx-auto text-center mb-16 sm:mb-24">
+          <div ref={workflowRef} className="max-w-3xl mx-auto text-center mb-16 sm:mb-20">
             <p
               data-reveal-line
-              className="text-xs font-semibold uppercase tracking-[0.16em] text-[#1a1a1a]/60 mb-5"
+              className="text-xs font-mono uppercase tracking-[0.16em] text-[#787D6D] font-semibold mb-4 sm:mb-5"
             >
               WISPR MAKES IT EASY
             </p>
@@ -1636,9 +1907,12 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 max-w-6xl mx-auto text-center">
+          <div
+            ref={workflowListRef}
+            className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 max-w-5xl mx-auto text-center"
+          >
             {/* Workflow Item 1: Starts automatically */}
-            <div className="flex flex-col items-center">
+            <div data-wf-item className="flex flex-col items-center">
               <div className="h-24 flex items-center justify-center mb-6">
                 <img
                   src={workflowIconStarts}
@@ -1655,7 +1929,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Workflow Item 2: Whatever you use */}
-            <div className="flex flex-col items-center">
+            <div data-wf-item className="flex flex-col items-center">
               <div className="h-24 flex items-center justify-center mb-6">
                 <img
                   src={workflowIconWhatever}
@@ -1672,7 +1946,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Workflow Item 3: Connects with your AI */}
-            <div className="flex flex-col items-center">
+            <div data-wf-item className="flex flex-col items-center">
               <div className="h-24 flex items-center justify-center mb-6">
                 <img
                   src={workflowIconConnects}
@@ -1694,291 +1968,398 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       {/* 6. Granola / Otter Migration Card */}
       <section className="py-8 sm:py-14 bg-[#ffffeb]">
         <Container>
-          <div className="max-w-6xl mx-auto rounded-[2rem] sm:rounded-[2.75rem] bg-[#E4E4D0] px-7 sm:px-12 py-9 sm:py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
-            {/* Left Column: Heading */}
-            <div className="lg:col-span-4">
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-[2.65rem] font-normal leading-[1.08] text-[#1a1a1a] tracking-[-0.015em]">
-                Switch without<br />
-                <em className="italic font-normal">losing a thing.</em>
+          <div
+            ref={migrationCardRef}
+            className="max-w-6xl mx-auto rounded-[1.5rem] sm:rounded-[1.75rem] bg-[#e2e2d2] px-7 py-10 sm:px-12 sm:py-12 grid md:grid-cols-12 gap-8 items-center"
+          >
+            {/* Left Column: Editorial Headline */}
+            <div className="md:col-span-4">
+              <h2 className="font-display text-3xl sm:text-[2.6rem] lg:text-[2.85rem] leading-[0.98] tracking-[-0.025em] text-[#1a1a1a]">
+                Switch without
+                <br />
+                losing <em className="italic font-normal">a thing.</em>
               </h2>
             </div>
 
-            {/* Middle Column: Copy & CTA */}
-            <div className="lg:col-span-4 space-y-2.5 max-w-sm">
-              <h3 className="font-semibold text-sm sm:text-base text-[#1a1a1a] leading-snug">
+            {/* Center Column: Copy + Get Started Link */}
+            <div className="md:col-span-4 space-y-2.5">
+              <p className="text-xs sm:text-[0.84rem] font-semibold text-[#1a1a1a]">
                 Coming from Granola or Otter?
-              </h3>
-              <p className="text-xs sm:text-sm text-[#1a1a1a]/80 leading-relaxed">
+              </p>
+              <p className="text-xs sm:text-[0.8125rem] text-[#1a1a1a]/75 leading-[1.45] max-w-[17rem]">
                 Import your entire meeting history in a few easy steps. You&apos;ll see the source, meeting date, summary, and transcript.
               </p>
-              <div className="pt-3 sm:pt-4">
+              <div className="pt-2.5">
                 <AppLink
                   to="/get-started"
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:underline underline-offset-4 transition-all group"
+                  className="inline-flex items-center gap-2 text-xs sm:text-[0.84rem] font-semibold text-[#1a1a1a] hover:opacity-75 transition-opacity"
                 >
                   <span>Get started</span>
-                  <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </AppLink>
               </div>
             </div>
 
-            {/* Right Column: Exact Illustration */}
-            <div className="lg:col-span-4 flex items-center justify-center lg:justify-end">
-              <img
-                src={switchMigrationIllus}
-                alt="Switch from Granola or Otter to Wispr Flow"
-                className="w-full max-w-[19rem] sm:max-w-[22rem] h-auto object-contain select-none pointer-events-none"
-                loading="lazy"
-              />
+            {/* Right Column: Dual-Window Transfer Illustration */}
+            <div className="md:col-span-4 flex items-center justify-center md:justify-end">
+              <svg
+                viewBox="0 0 320 205"
+                className="w-full max-w-[19.5rem]"
+                fill="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <clipPath id={`move-clip-${uid}`}>
+                    <rect x="0" y="0" width="320" height="205" />
+                  </clipPath>
+                </defs>
+                <g clipPath={`url(#move-clip-${uid})`}>
+                  {/* Back Window: Wispr Cream/Orange Screen */}
+                  <rect
+                    x="114"
+                    y="16"
+                    width="186"
+                    height="128"
+                    rx="12"
+                    fill="#ffffeb"
+                    stroke="#1a1a1a"
+                    strokeWidth="2"
+                  />
+                  {/* Top Dots + Flow Waveform inside Back Window */}
+                  <circle cx="127" cy="28" r="2.2" fill="#1a1a1a" />
+                  <circle cx="135" cy="28" r="2.2" fill="#1a1a1a" />
+                  <circle cx="143" cy="28" r="2.2" fill="#1a1a1a" />
+                  <rect x="268" y="24" width="2" height="9" rx="1" fill="#1a1a1a" />
+                  <rect x="272.5" y="26" width="2" height="5" rx="1" fill="#1a1a1a" />
+                  <rect x="277" y="23" width="2" height="11" rx="1" fill="#1a1a1a" />
+                  <rect x="281.5" y="25.5" width="2" height="6" rx="1" fill="#1a1a1a" />
+                  <rect x="286" y="24" width="2" height="9" rx="1" fill="#1a1a1a" />
+                  {/* Inner Orange Workspace */}
+                  <rect x="122" y="39" width="170" height="97" rx="6" fill="#f9a84d" />
+
+                  {/* Front Window: Deep Emerald Green */}
+                  <rect
+                    x="18"
+                    y="68"
+                    width="176"
+                    height="118"
+                    rx="12"
+                    fill="#03473e"
+                    stroke="#1a1a1a"
+                    strokeWidth="2"
+                  />
+                  <circle cx="32" cy="80" r="2.2" fill="#1a1a1a" />
+                  <circle cx="40" cy="80" r="2.2" fill="#1a1a1a" />
+                  <circle cx="48" cy="80" r="2.2" fill="#1a1a1a" />
+
+                  {/* Notepad 1 (Inside Emerald Window) */}
+                  <g transform="translate(88, 92) rotate(-14)">
+                    <path d="M -4 8 L -2 48" stroke="#1a1a1a" strokeWidth="1.6" strokeLinecap="round" />
+                    <path d="M -1 4 L 1 46" stroke="#ffffeb" strokeWidth="1.8" strokeLinecap="round" />
+                    <rect x="2" y="0" width="44" height="50" rx="4" fill="#ffffeb" stroke="#1a1a1a" strokeWidth="1.8" />
+                    <rect x="2" y="0" width="44" height="12" rx="3" fill="#1a1a1a" />
+                    <path
+                      d="M 10 24 C 13 18, 17 18, 16 24 C 15 28, 21 28, 22 22 C 23 18, 27 18, 26 24 C 25 28, 31 28, 33 22 C 34 18, 38 19, 37 24"
+                      stroke="#1a1a1a"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M 10 36 C 13 30, 17 30, 16 36 C 15 40, 21 40, 22 34 C 23 30, 27 30, 26 36 C 25 40, 31 40, 33 34 C 34 30, 38 31, 37 36"
+                      stroke="#1a1a1a"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                    />
+                  </g>
+
+                  {/* Motion Streak Lines beneath Moving Pad */}
+                  <path d="M 142 152 L 172 126" stroke="#1a1a1a" strokeWidth="1.6" strokeLinecap="round" />
+                  <path d="M 152 158 L 182 134" stroke="#1a1a1a" strokeWidth="1.6" strokeLinecap="round" />
+                  <path d="M 164 156 L 188 136" stroke="#1a1a1a" strokeWidth="1.6" strokeLinecap="round" />
+
+                  {/* Notepad 2 (Transferring Between Windows) */}
+                  <g transform="translate(154, 48) rotate(-10)">
+                    <path d="M -3 6 L -1 46" stroke="#1a1a1a" strokeWidth="1.6" strokeLinecap="round" />
+                    <rect x="2" y="0" width="44" height="50" rx="4" fill="#ffffeb" stroke="#1a1a1a" strokeWidth="1.8" />
+                    <rect x="2" y="0" width="44" height="12" rx="3" fill="#1a1a1a" />
+                    <path
+                      d="M 10 24 C 13 18, 17 18, 16 24 C 15 28, 21 28, 22 22 C 23 18, 27 18, 26 24 C 25 28, 31 28, 33 22 C 34 18, 38 19, 37 24"
+                      stroke="#1a1a1a"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M 10 36 C 13 30, 17 30, 16 36 C 15 40, 21 40, 22 34 C 23 30, 27 30, 26 36 C 25 40, 31 40, 33 34 C 34 30, 38 31, 37 36"
+                      stroke="#1a1a1a"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                    />
+                  </g>
+
+                  {/* Notepad 3 (Landed Inside Orange Flow Window) */}
+                  <g transform="translate(242, 62) rotate(-12)">
+                    <path d="M -3 6 L -1 46" stroke="#1a1a1a" strokeWidth="1.6" strokeLinecap="round" />
+                    <rect x="2" y="0" width="44" height="50" rx="4" fill="#ffffeb" stroke="#1a1a1a" strokeWidth="1.8" />
+                    <rect x="2" y="0" width="44" height="12" rx="3" fill="#1a1a1a" />
+                    <path
+                      d="M 10 24 C 13 18, 17 18, 16 24 C 15 28, 21 28, 22 22 C 23 18, 27 18, 26 24 C 25 28, 31 28, 33 22 C 34 18, 38 19, 37 24"
+                      stroke="#1a1a1a"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M 10 36 C 13 30, 17 30, 16 36 C 15 40, 21 40, 22 34 C 23 30, 27 30, 26 36 C 25 40, 31 40, 33 34 C 34 30, 38 31, 37 36"
+                      stroke="#1a1a1a"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                    />
+                  </g>
+
+                  {/* Pink Pointing Hand + MOVE Label */}
+                  <g>
+                    <path
+                      d="M 218 186 L 195 144 C 193 140 197 137 200 140 L 207 147 C 209 144 214 145 215 149 C 217 146 222 148 222 153 L 239 186 Z"
+                      fill="#f5a7f0"
+                      stroke="#1a1a1a"
+                      strokeWidth="1.8"
+                      strokeLinejoin="round"
+                    />
+                    <line x1="184" y1="186" x2="254" y2="186" stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round" />
+
+                    {/* Dark MOVE Tooltip Pill */}
+                    <rect x="228" y="147" width="46" height="19" rx="5" fill="#1a1a1a" />
+                    <text
+                      x="251"
+                      y="160"
+                      textAnchor="middle"
+                      fill="#ffffeb"
+                      fontSize="9.5"
+                      fontWeight="700"
+                      letterSpacing="0.08em"
+                      fontFamily="JetBrains Mono, monospace"
+                    >
+                      MOVE
+                    </text>
+                  </g>
+                </g>
+              </svg>
             </div>
           </div>
         </Container>
       </section>
 
       {/* 7. Enterprise Controls ("FOR BUSINESS") */}
-      <section className="py-20 sm:py-28 lg:py-32 bg-[#ffffeb]">
+      <section className="py-16 sm:py-24 bg-[#ffffeb]">
         <Container>
-          <div ref={enterpriseRef} className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
-            {/* Left Column: Heading & CTA */}
-            <div className="lg:col-span-6 flex flex-col justify-between self-stretch">
-              <div>
-                <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-5 sm:mb-6">
-                  FOR BUSINESS
-                </p>
-                <h2 className="font-display text-4xl sm:text-6xl lg:text-[4.25rem] font-normal leading-[1.0] tracking-[-0.025em] text-[#1a1a1a] mb-6 sm:mb-7">
-                  Bring Notetaker<br />
-                  to <em className="italic font-normal">your team.</em>
-                </h2>
-                <p className="text-base sm:text-lg text-[#1a1a1a]/75 leading-relaxed max-w-md">
-                  Help your team move work forward, with the controls your organization needs.
-                </p>
-              </div>
-
-              <div className="pt-12 sm:pt-20 lg:pt-32">
-                <AppLink
-                  to="/privacy"
-                  className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold text-[#1a1a1a] hover:underline underline-offset-4 transition-all group"
-                >
-                  <span>Explore enterprise privacy controls</span>
-                  <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                </AppLink>
-              </div>
-            </div>
-
-            {/* Right Column: Stacked Controls List */}
-            <div className="lg:col-span-6 space-y-8 sm:space-y-10">
-              {/* Item 1: Control Notetaker access */}
-              <div data-ent-item>
-                <div className="flex items-center gap-3.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
-                    <SlidersHorizontal className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
-                    Control Notetaker access
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
-                  Turn Notetaker on or off across your organization.
-                </p>
-              </div>
-
-              {/* Item 2: Optional consent acknowledgment */}
-              <div data-ent-item>
-                <div className="flex items-center gap-3.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
-                    <ClipboardCheck className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
-                    Optional consent acknowledgment
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
-                  Choose to require users to confirm they&apos;ve obtained participant consent before recording.
-                </p>
-              </div>
-
-              {/* Item 3: No training on your meeting data */}
-              <div data-ent-item>
-                <div className="flex items-center gap-3.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
-                    <Power className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
-                    No training on your meeting data
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
-                  Model training is disabled for every enterprise account.
-                </p>
-              </div>
-
-              {/* Item 4: Set privacy rules centrally */}
-              <div data-ent-item>
-                <div className="flex items-center gap-3.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#e8e8d8] border border-black/5 flex items-center justify-center text-[#1a1a1a] shrink-0">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-bold text-base sm:text-[1.05rem] text-[#1a1a1a]">
-                    Set privacy rules centrally
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-[#1a1a1a]/75 leading-relaxed">
-                  Apply organization-level privacy restrictions that individual users can&apos;t change.
-                </p>
-              </div>
-
-              {/* Footnote */}
-              <p className="italic text-xs sm:text-sm text-[#1a1a1a]/55 pt-2">
-                *Consent acknowledgment is available on request.
+          <div ref={enterpriseRef} className="max-w-4xl mx-auto">
+            <div className="mb-10 sm:mb-12">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3">
+                FOR BUSINESS
               </p>
+              <h2
+                className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.025em] mb-4"
+                style={{ textWrap: 'balance' }}
+              >
+                Bring Notetaker to <em className="italic font-normal">your team.</em>
+              </h2>
+              <p className="text-sm sm:text-base text-[#1a1a1a]/75 max-w-lg leading-relaxed mb-4">
+                Help your team move work forward, with the controls your organization needs.
+              </p>
+              <AppLink
+                to="/privacy"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:opacity-75 transition-opacity"
+              >
+                <span>Explore enterprise privacy controls</span>
+                <ChevronRight className="w-4 h-4" />
+              </AppLink>
             </div>
+
+            <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
+              {ENTERPRISE_CONTROLS.map((item, idx) => {
+                const Icon =
+                  idx === 0 ? Users : idx === 1 ? ShieldCheck : idx === 2 ? EyeOff : Lock;
+                return (
+                  <div key={item.id} data-ent-item className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-lg bg-[#e4e4d0] text-[#1a1a1a] flex items-center justify-center shrink-0 mt-0.5">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm sm:text-base font-semibold text-[#1a1a1a] mb-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#1a1a1a]/70 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <p className="text-[0.72rem] text-[#1a1a1a]/55 mt-8">
+              *Consent acknowledgment is available on request.
+            </p>
           </div>
         </Container>
       </section>
 
-      {/* 8. Dedicated Notetaker Testimonials Section */}
+      {/* 8. Notetaker Testimonials Slider Section */}
       <NotetakerTestimonials />
 
-      {/* 9. Notetaker FAQ Section - Split 2-Panel Master-Detail matching reference image */}
-      <section className="py-20 sm:py-28 bg-[#ffffeb]">
+      {/* 9. Notetaker FAQ Accordion */}
+      <section className="py-16 sm:py-24 bg-[#ffffeb]">
         <Container>
-          <div className="text-center mb-12 sm:mb-16">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3">
+          <div className="text-center mb-10 sm:mb-12">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3">
               FAQS
             </p>
-            <h2 className="font-display text-4xl sm:text-6xl lg:text-[4.25rem] font-normal leading-[1.0] tracking-[-0.02em] text-[#1a1a1a]">
+            <h2 className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.02em]">
               You might <em className="italic font-normal">be wondering.</em>
             </h2>
           </div>
 
-          <div className="max-w-6xl mx-auto rounded-[2.25rem] sm:rounded-[3rem] bg-[#E3E5D4] p-5 sm:p-8 lg:p-10 shadow-sm border border-black/5">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-              {/* Left Column: Questions List (Dark Green Box) */}
-              <div className="lg:col-span-5 rounded-[1.75rem] sm:rounded-[2rem] bg-[#06443B] p-5 sm:p-7 text-[#ffffeb] flex flex-col shadow-inner">
-                <h3 className="font-display text-2xl sm:text-[1.75rem] font-normal text-[#ffffeb] mb-5 shrink-0">
-                  Questions
-                </h3>
-
-                <div className="space-y-2 overflow-y-auto max-h-[380px] sm:max-h-[440px] pr-1.5 custom-scrollbar">
-                  {NOTETAKER_FAQS.map((faq) => {
-                    const isSelected = activeFaqId === faq.id;
-                    return (
-                      <button
-                        key={faq.id}
-                        type="button"
-                        onClick={() => setActiveFaqId(faq.id)}
-                        className={`w-full text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer block ${
-                          isSelected
-                            ? 'bg-white/10 text-[#ffffeb] font-semibold shadow-sm'
-                            : 'text-[#ffffeb]/80 hover:text-[#ffffeb] hover:bg-white/5 font-medium'
-                        }`}
-                      >
-                        <span className="text-xs sm:text-[14px] leading-snug block">
-                          {faq.question}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Right Column: Answer Panel */}
-              {(() => {
-                const activeFaq =
-                  NOTETAKER_FAQS.find((f) => f.id === activeFaqId) || NOTETAKER_FAQS[0];
+          <div className="max-w-5xl mx-auto rounded-[1.75rem] bg-[#03473e] text-[#ffffeb] p-6 sm:p-10 shadow-xl">
+            <h3 className="font-display text-2xl sm:text-[1.75rem] mb-6">Questions</h3>
+            <div className="divide-y divide-[#ffffeb]/12">
+              {NOTETAKER_FAQS.map((faq) => {
+                const isOpen = openFaqId === faq.id;
                 return (
-                  <div className="lg:col-span-7 flex flex-col justify-start">
-                    <h3 className="font-display text-2xl sm:text-[1.75rem] font-normal text-[#1a1a1a] mb-2">
-                      Answer
-                    </h3>
-                    <p className="font-semibold text-xs sm:text-sm text-[#1a1a1a]/70 mb-3 line-clamp-1">
-                      {activeFaq.question}
-                    </p>
+                  <div key={faq.id}>
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
+                      className="w-full py-4 flex items-center justify-between gap-4 text-left cursor-pointer group"
+                    >
+                      <span className="text-xs sm:text-sm font-medium text-[#ffffeb]/95 group-hover:text-[#ffffeb]">
+                        {faq.question}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 shrink-0 text-[#ffffeb]/75 transition-transform duration-200 ${
+                          isOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
 
-                    <div className="rounded-2xl sm:rounded-3xl bg-[#ffffeb] p-6 sm:p-8 lg:p-9 shadow-sm border border-black/5 min-h-[340px] flex-1 flex flex-col justify-between">
-                      <div className="space-y-4 text-xs sm:text-sm md:text-[15px] leading-relaxed text-[#1a1a1a]/85 font-body">
-                        {activeFaq.answer.split('\n\n').map((paragraph, pIdx) => (
-                          <p key={pIdx}>{paragraph}</p>
-                        ))}
-                      </div>
-                    </div>
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22 }}
+                          className="overflow-hidden"
+                        >
+                          <p className="pb-4 text-xs sm:text-sm text-[#ffffeb]/75 leading-relaxed max-w-3xl">
+                            {faq.answer}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
-              })()}
+              })}
             </div>
           </div>
         </Container>
       </section>
 
       {/* 10. Editorial Guides ("Level up your note taking.") */}
-      <section id="guides" className="py-20 sm:py-28 lg:py-32 bg-[#EFECE6] text-[#141414]">
+      <section id="guides" className="py-16 sm:py-24 bg-[#ffffeb]">
         <Container>
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.02] tracking-tight text-[#141414]">
-              <em className="italic font-normal">Level up</em> your note taking.
+          <div className="text-center mb-10 sm:mb-14">
+            <h2 className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.02em]">
+              Level <em className="italic font-normal">up</em> your note taking.
             </h2>
           </div>
 
-          <div
-            ref={guidesRef}
-            className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 max-w-6xl mx-auto"
-          >
+          <div ref={guidesRef} className="max-w-4xl mx-auto space-y-6">
             {NOTETAKER_GUIDES.map((guide) => {
-              const guideImgs =
+              const cardPhoto =
                 guide.variant === 'granola'
-                  ? { cover: granolaGuideImg, avatar: robSolomonAvatar }
+                  ? clayImg
                   : guide.variant === 'inperson'
-                  ? { cover: inPersonGuideImg, avatar: sammYatesAvatar }
-                  : { cover: zoomGuideImg, avatar: robSolomonAvatar };
+                  ? alexImg
+                  : stevenImg;
+              const authorAvatar =
+                guide.variant === 'granola'
+                  ? daveImg
+                  : guide.variant === 'inperson'
+                  ? alexImg
+                  : stevenImg;
 
               return (
                 <article
                   key={guide.id}
-                  className="group flex flex-col p-3 sm:p-4 rounded-[24px] sm:rounded-[28px] bg-[#FFFFEB]/0 hover:bg-[#FFFFEB] transition-all duration-200 ease-out hover:shadow-[0_12px_36px_rgba(0,0,0,0.06)] cursor-pointer"
+                  className="rounded-[1.75rem] bg-[#e2e2d2] overflow-hidden border border-[#1a1a1a]/8 shadow-xs transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   <button
                     type="button"
                     onClick={() => setActiveGuide(guide)}
-                    className="text-center w-full flex flex-col h-full cursor-pointer focus:outline-none"
+                    className="w-full text-left cursor-pointer block"
                   >
-                    {/* Visual Thumbnail */}
-                    <div className="w-full aspect-[16/10] rounded-[16px] sm:rounded-[18px] overflow-hidden bg-black/5 relative mb-3.5">
+                    {/* Visual Banner */}
+                    <div className="relative h-56 sm:h-72 overflow-hidden bg-[#1a1a1a]">
                       <img
-                        src={guideImgs.cover}
+                        src={cardPhoto}
                         alt={guide.title}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                        className="w-full h-full object-cover opacity-65"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
+
+                      {guide.variant === 'granola' && (
+                        <div className="absolute inset-0 flex items-center justify-center p-6">
+                          <div className="w-full max-w-md rounded-xl bg-[#ffffeb] text-[#1a1a1a] p-5 shadow-2xl">
+                            <div className="font-display text-2xl sm:text-3xl mb-3">
+                              Granola alternatives
+                            </div>
+                            <div className="space-y-2">
+                              <div className="h-2.5 w-3/4 rounded-full bg-[#1a1a1a]/15" />
+                              <div className="h-2.5 w-2/3 rounded-full bg-[#1a1a1a]/12" />
+                              <div className="h-2.5 w-1/2 rounded-full bg-[#1a1a1a]/10" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {guide.variant === 'inperson' && (
+                        <div className="absolute inset-0 flex items-center justify-center p-6">
+                          <div className="rounded-xl bg-[#03473e] text-[#ffffeb] px-6 py-4 shadow-2xl border border-[#ffffeb]/15">
+                            <div className="font-display text-2xl sm:text-3xl">
+                              Less note-taking. More listening.
+                            </div>
+                            <div className="mt-2 w-7 h-7 rounded-md bg-[#ffffeb]/15 flex items-center justify-center">
+                              <FlowWaveformMark className="w-4 h-4 text-[#cef5ca]" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Tag / Category Badge (Centered) */}
-                    <div className="mb-2.5">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] bg-[#E3DED5] text-[#3A3834] text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider">
+                    {/* Clean Typography Body */}
+                    <div className="p-6 sm:p-8 text-center">
+                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-2">
                         {guide.category}
-                      </span>
-                    </div>
-
-                    {/* Title (Centered) */}
-                    <h3 className="font-display text-lg sm:text-[1.25rem] lg:text-[1.32rem] leading-[1.28] font-normal text-[#141414] mb-5 text-center px-1 line-clamp-2 min-h-[3.2rem]">
-                      {guide.title}
-                    </h3>
-
-                    {/* Author & Read Time Footer */}
-                    <div className="flex items-center justify-between mt-auto pt-1 px-1 text-xs text-[#555] w-full">
-                      <div className="flex items-center gap-2">
-                        <img
-                          src={guideImgs.avatar}
-                          alt={guide.author}
-                          referrerPolicy="no-referrer"
-                          className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover shrink-0 ring-1 ring-black/10"
-                        />
-                        <span className="font-medium text-[#222]">{guide.author}</span>
-                        <span className="text-[#888]">•</span>
-                        <span className="text-[#666]">{guide.date}</span>
                       </div>
-                      <span className="px-2 py-0.5 rounded-[4px] bg-[#E3DED5]/85 text-[#555] font-mono text-[10px] sm:text-[11px] font-medium tracking-tight uppercase">
-                        {guide.readTime}
-                      </span>
+                      <h3 className="font-display text-2xl sm:text-3xl leading-tight mb-5">
+                        {guide.title}
+                      </h3>
+
+                      <div className="flex items-center justify-between text-xs text-[#1a1a1a]/65 pt-2">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={authorAvatar}
+                            alt={guide.author}
+                            referrerPolicy="no-referrer"
+                            className="w-6 h-6 rounded-full object-cover"
+                          />
+                          <span>
+                            {guide.author} · {guide.date}
+                          </span>
+                        </div>
+                        <span className="font-medium tracking-wider uppercase">{guide.readTime}</span>
+                      </div>
                     </div>
                   </button>
                 </article>
@@ -1989,49 +2370,46 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       </section>
 
       {/* 11. Notetaker Final CTA */}
-      <section ref={finalCtaRef} className="px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 bg-[#EFECE6]">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative rounded-[2.5rem] sm:rounded-[3.5rem] lg:rounded-[4.5rem] overflow-hidden min-h-[32rem] sm:min-h-[40rem] lg:min-h-[44rem] flex items-center justify-center text-center text-[#ffffeb] px-6 py-20 sm:py-28 shadow-[0_25px_60px_rgba(0,0,0,0.18)]">
+      <section ref={finalCtaRef} className="pb-12 sm:pb-16 bg-[#ffffeb]">
+        <Container>
+          <div className="relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden min-h-[28rem] sm:min-h-[34rem] flex items-center justify-center text-center text-[#ffffeb] px-6 py-16">
             <img
-              src={ntCtaBg}
-              alt="Wispr Flow Notetaker CTA"
+              src={atmosphereImg}
+              alt=""
               referrerPolicy="no-referrer"
-              className="absolute inset-0 w-full h-full object-cover object-center"
+              className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/35" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/45 via-[#1a1a1a]/55 to-[#1a1a1a]/75" />
 
-            <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+            <div className="relative z-10 max-w-2xl mx-auto">
               <h2
-                className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem] leading-[0.98] tracking-tight text-[#FFFFEB] mb-6"
+                className="font-display text-4xl sm:text-5xl lg:text-[4rem] leading-[0.96] tracking-[-0.025em] mb-4"
                 style={{ textWrap: 'balance' }}
               >
-                Put your words to work <br className="hidden sm:inline" />
-                in more ways <em className="italic font-normal">than one.</em>
+                Put your words to work in more ways <em className="italic font-normal">than one.</em>
               </h2>
-
-              <p className="text-sm sm:text-base lg:text-lg text-[#FFFFEB]/85 max-w-xl mx-auto leading-relaxed mb-8 font-body">
+              <p className="text-sm sm:text-base text-[#ffffeb]/85 max-w-md mx-auto leading-relaxed mb-7">
                 Capture meeting notes with Notetaker and write emails, messages, and documents by speaking with Flow. Both in one subscription.
               </p>
 
               <button
                 type="button"
                 onClick={() => onOpenDownload('notetaker')}
-                className="inline-flex items-center justify-center gap-2.5 bg-[#E4D1FF] hover:bg-[#D8BEFF] rounded-xl px-7 py-3.5 text-sm sm:text-base font-medium text-[#141414] transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shadow-md hover:shadow-lg whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-2.5 bg-[#f0d7ff] hover:bg-[#e7c4ff] border border-[#1a1a1a] rounded-[0.55rem] px-6 py-3.5 text-sm sm:text-base font-semibold text-[#1a1a1a] transition-transform duration-200 hover:-translate-y-0.5 cursor-pointer whitespace-nowrap"
               >
                 <OsButtonIcon os={detectedOS} />
                 <span>
-                  {detectedOS === 'mac' ? 'Get started on Mac' : 'Get started on Windows'}
+                  {detectedOS === 'mac' ? 'Download for Mac' : 'Get started on Windows'}
                 </span>
               </button>
 
-              <div className="text-xs sm:text-[13px] font-medium text-[#FFFFEB]/75 mt-4">
+              <div className="text-xs text-[#ffffeb]/70 mt-3.5">
                 Available on Mac and Windows
               </div>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
-
 
       {/* Interactive Guide Reader Modal */}
       <AnimatePresence>
