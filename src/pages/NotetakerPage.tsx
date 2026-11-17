@@ -136,15 +136,42 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
 
   // Animation refs
   const heroRef = useRef<HTMLDivElement>(null);
+  const heroCardRef = useRef<HTMLDivElement>(null);
   const quoteSectionRef = useRef<HTMLElement>(null);
   const captureStageRef = useRef<HTMLElement>(null);
   const walkthroughTrackRef = useRef<HTMLDivElement>(null);
   const floatingCardRef = useRef<HTMLDivElement>(null);
   const cardFeedRef = useRef<HTMLDivElement>(null);
+  const mikelAvatarRef = useRef<HTMLButtonElement>(null);
+  const stephenAvatarRef = useRef<HTMLButtonElement>(null);
   const bottomLeftPortraitRef = useRef<HTMLButtonElement>(null);
   const waveformPillRef = useRef<HTMLDivElement>(null);
   const leftNavRef = useRef<HTMLDivElement>(null);
+  const navIndicatorRef = useRef<HTMLDivElement>(null);
   const rightCopyRef = useRef<HTMLDivElement>(null);
+  const backgroundWaveRef = useRef<SVGPathElement>(null);
+
+  // Walkthrough Chapter Cards & Copy Refs
+  const card0Ref = useRef<HTMLDivElement>(null);
+  const card1Ref = useRef<HTMLDivElement>(null);
+  const card2Ref = useRef<HTMLDivElement>(null);
+  const card3Ref = useRef<HTMLDivElement>(null);
+  const card4Ref = useRef<HTMLDivElement>(null);
+
+  const copy0Ref = useRef<HTMLDivElement>(null);
+  const copy1Ref = useRef<HTMLDivElement>(null);
+  const copy2Ref = useRef<HTMLDivElement>(null);
+  const copy3Ref = useRef<HTMLDivElement>(null);
+  const copy4Ref = useRef<HTMLDivElement>(null);
+
+  const chapter1InputTextRef = useRef<HTMLSpanElement>(null);
+  const chapter1CursorRef = useRef<HTMLSpanElement>(null);
+  const chapter1SentPillRef = useRef<HTMLDivElement>(null);
+  const chapter1IllusRef = useRef<HTMLDivElement>(null);
+
+  const mcpPromptTextRef = useRef<HTMLSpanElement>(null);
+  const mcpCursorRef = useRef<HTMLSpanElement>(null);
+
   const workflowRef = useRef<HTMLDivElement>(null);
   const enterpriseRef = useRef<HTMLDivElement>(null);
   const guidesRef = useRef<HTMLDivElement>(null);
@@ -232,72 +259,115 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const ctx = gsap.context(() => {
+      // Hero reveal & subtle ambient card floating
       if (heroRef.current) {
         const items = heroRef.current.querySelectorAll('[data-nt-hero]');
         gsap.fromTo(
           items,
-          { opacity: 0, y: 18 },
+          { opacity: 0, y: 22 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.65,
-            stagger: 0.07,
+            duration: 0.7,
+            stagger: 0.08,
             ease: 'power3.out',
             clearProps: 'transform,opacity',
           }
         );
       }
 
+      if (heroCardRef.current) {
+        gsap.to(heroCardRef.current, {
+          y: '-=6',
+          rotation: 0.8,
+          duration: 3.4,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        });
+      }
+
+      // Emerald capture stage: ambient continuous floating + scroll convergence scrub
       if (captureStageRef.current) {
-        const fgBubbles = captureStageRef.current.querySelectorAll('[data-bubble-fg]');
-        const bgBubbles = captureStageRef.current.querySelectorAll('[data-bubble-bg]');
-        if (fgBubbles.length) {
-          gsap.fromTo(
-            fgBubbles,
-            { y: 16 },
-            {
-              y: -16,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: captureStageRef.current,
-                start: 'top bottom',
-                end: 'bottom top',
-                scrub: 0.6,
-              },
-            }
-          );
+        const allBubbles = captureStageRef.current.querySelectorAll<HTMLElement>(
+          '[data-bubble-fg], [data-bubble-bg]'
+        );
+        allBubbles.forEach((bubble, idx) => {
+          const dir = idx % 2 === 0 ? 1 : -1;
+          gsap.to(bubble, {
+            y: `+=${dir * 6}`,
+            x: `+=${dir * 3}`,
+            rotation: dir * 1.3,
+            duration: 2.8 + idx * 0.35,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+          });
+        });
+
+        const leftBubbles = captureStageRef.current.querySelectorAll('[data-bubble-left]');
+        const rightBubbles = captureStageRef.current.querySelectorAll('[data-bubble-right]');
+        if (leftBubbles.length) {
+          gsap.to(leftBubbles, {
+            x: 36,
+            y: 28,
+            scale: 0.94,
+            opacity: 0.55,
+            ease: 'power1.out',
+            scrollTrigger: {
+              trigger: captureStageRef.current,
+              start: 'center center',
+              end: 'bottom top',
+              scrub: 1,
+            },
+          });
         }
-        if (bgBubbles.length) {
-          gsap.fromTo(
-            bgBubbles,
-            { y: 8 },
-            {
-              y: -8,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: captureStageRef.current,
-                start: 'top bottom',
-                end: 'bottom top',
-                scrub: 0.6,
-              },
-            }
-          );
+        if (rightBubbles.length) {
+          gsap.to(rightBubbles, {
+            x: -36,
+            y: 28,
+            scale: 0.94,
+            opacity: 0.55,
+            ease: 'power1.out',
+            scrollTrigger: {
+              trigger: captureStageRef.current,
+              start: 'center center',
+              end: 'bottom top',
+              scrub: 1,
+            },
+          });
         }
       }
     });
 
-    // Desktop end-to-end scroll handoff: Emerald bubbles -> Floating card glides across intro headline -> Sticky 3-column walkthrough
+    // Desktop end-to-end scroll handoff: Floating card glides across intro headline -> Master Scroll-Pinned Walkthrough
     const mm = gsap.matchMedia();
     mm.add('(min-width: 1024px)', () => {
       const track = walkthroughTrackRef.current;
       if (!track) return;
 
+      // 1. Initial states of stacked elements
+      gsap.set([card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current], {
+        opacity: 0,
+        scale: 0.96,
+      });
+      gsap.set([copy1Ref.current, copy2Ref.current, copy3Ref.current, copy4Ref.current], {
+        opacity: 0,
+        y: 16,
+      });
+      if (card0Ref.current) gsap.set(card0Ref.current, { opacity: 1, scale: 1 });
+      if (copy0Ref.current) gsap.set(copy0Ref.current, { opacity: 1, y: 0 });
+      if (chapter1InputTextRef.current) gsap.set(chapter1InputTextRef.current, { maxWidth: '0%' });
+      if (chapter1SentPillRef.current) gsap.set(chapter1SentPillRef.current, { opacity: 0, y: 10, scale: 0.92 });
+      if (mcpPromptTextRef.current) gsap.set(mcpPromptTextRef.current, { maxWidth: '0%' });
+
+      // 2. Entrance handoff timeline (from Emerald headline into Walkthrough)
       const arrivalTl = gsap.timeline({
         scrollTrigger: {
           trigger: track,
-          start: 'top bottom',
+          start: 'top 85%',
           end: 'top top',
-          scrub: true,
+          scrub: 0.8,
           invalidateOnRefresh: true,
         },
       });
@@ -305,71 +375,231 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       if (floatingCardRef.current) {
         arrivalTl.fromTo(
           floatingCardRef.current,
-          { y: () => -Math.round(window.innerHeight * 0.88) },
-          { y: 0, ease: 'none', duration: 1 },
+          { y: 140, opacity: 0.8 },
+          { y: 0, opacity: 1, ease: 'power2.out', duration: 1 },
           0
-        );
-      }
-
-      if (cardFeedRef.current) {
-        arrivalTl.fromTo(
-          cardFeedRef.current,
-          { y: 0 },
-          { y: -355, ease: 'power1.inOut', duration: 0.85 },
-          0.12
         );
       }
 
       if (bottomLeftPortraitRef.current) {
         arrivalTl.fromTo(
           bottomLeftPortraitRef.current,
-          { opacity: 0, scale: 0.88, y: 12 },
-          { opacity: 1, scale: 1, y: 0, ease: 'power2.out', duration: 0.35 },
-          0.56
+          { opacity: 0, scale: 0.8, y: 16 },
+          { opacity: 1, scale: 1, y: 0, ease: 'back.out(1.4)', duration: 0.4 },
+          0.4
+        );
+      }
+
+      if (mikelAvatarRef.current) {
+        arrivalTl.fromTo(
+          mikelAvatarRef.current,
+          { opacity: 0, scale: 0.8, y: -12 },
+          { opacity: 1, scale: 1, y: 0, ease: 'back.out(1.4)', duration: 0.4 },
+          0.45
+        );
+      }
+
+      if (stephenAvatarRef.current) {
+        arrivalTl.fromTo(
+          stephenAvatarRef.current,
+          { opacity: 0, scale: 0.8, x: 14 },
+          { opacity: 1, scale: 1, x: 0, ease: 'back.out(1.4)', duration: 0.4 },
+          0.5
         );
       }
 
       if (waveformPillRef.current) {
         arrivalTl.fromTo(
           waveformPillRef.current,
-          { opacity: 0, scale: 0.86 },
-          { opacity: 1, scale: 1, ease: 'power2.out', duration: 0.32 },
-          0.62
+          { opacity: 0, scale: 0.85 },
+          { opacity: 1, scale: 1, ease: 'power2.out', duration: 0.35 },
+          0.6
         );
       }
 
       if (leftNavRef.current) {
         arrivalTl.fromTo(
           leftNavRef.current,
-          { opacity: 0, x: -16 },
-          { opacity: 1, x: 0, ease: 'power2.out', duration: 0.32 },
-          0.68
+          { opacity: 0, x: -20 },
+          { opacity: 1, x: 0, ease: 'power2.out', duration: 0.35 },
+          0.65
         );
       }
 
       if (rightCopyRef.current) {
         arrivalTl.fromTo(
           rightCopyRef.current,
-          { opacity: 0, y: 18 },
-          { opacity: 1, y: 0, ease: 'power2.out', duration: 0.32 },
-          0.68
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, ease: 'power2.out', duration: 0.35 },
+          0.65
         );
       }
 
-      ScrollTrigger.create({
-        trigger: track,
-        start: 'top top',
-        end: 'bottom bottom',
-        onUpdate: (self) => {
-          const p = self.progress;
-          const nextIdx =
-            p < 0.22 ? 0 : p < 0.42 ? 1 : p < 0.62 ? 2 : p < 0.82 ? 3 : 4;
-          if (nextIdx !== activeChapterRef.current) {
-            activeChapterRef.current = nextIdx;
-            setActiveChapter(nextIdx);
-          }
+      // 3. Master Walkthrough Storytelling Timeline (Scrubbed with ScrollTrigger)
+      const masterTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: track,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1,
+          onUpdate: (self) => {
+            const p = self.progress;
+            const nextIdx =
+              p < 0.20 ? 0 : p < 0.40 ? 1 : p < 0.60 ? 2 : p < 0.80 ? 3 : 4;
+            if (nextIdx !== activeChapterRef.current) {
+              activeChapterRef.current = nextIdx;
+              setActiveChapter(nextIdx);
+            }
+          },
         },
       });
+
+      // Total timeline units = 20.0
+      // Background Wave Parallax Drift
+      if (backgroundWaveRef.current) {
+        masterTl.fromTo(
+          backgroundWaveRef.current,
+          { x: -50 },
+          { x: 50, ease: 'none', duration: 20 },
+          0
+        );
+      }
+
+      // Phase 0: Chapter 0 (0.0 -> 3.2)
+      if (cardFeedRef.current) {
+        masterTl.fromTo(
+          cardFeedRef.current,
+          { y: 0 },
+          { y: -355, ease: 'power1.inOut', duration: 3.2 },
+          0
+        );
+      }
+      if (mikelAvatarRef.current) {
+        masterTl.to(mikelAvatarRef.current, { scale: 1.08, duration: 0.8, ease: 'power1.out', yoyo: true, repeat: 1 }, 0.2);
+      }
+      if (stephenAvatarRef.current) {
+        masterTl.to(stephenAvatarRef.current, { scale: 1.08, duration: 0.8, ease: 'power1.out', yoyo: true, repeat: 1 }, 1.2);
+      }
+      if (bottomLeftPortraitRef.current) {
+        masterTl.to(bottomLeftPortraitRef.current, { scale: 1.08, duration: 0.8, ease: 'power1.out', yoyo: true, repeat: 1 }, 2.0);
+      }
+
+      // Transition 0 -> 1 (3.2 -> 4.2)
+      if (card0Ref.current) {
+        masterTl.to(card0Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 3.2);
+      }
+      if (copy0Ref.current) {
+        masterTl.to(copy0Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 3.2);
+      }
+      const avatars = [mikelAvatarRef.current, stephenAvatarRef.current, bottomLeftPortraitRef.current].filter(Boolean);
+      if (avatars.length) {
+        masterTl.to(avatars, { opacity: 0, scale: 0.8, ease: 'power2.inOut', duration: 0.8 }, 3.2);
+      }
+      if (card1Ref.current) {
+        masterTl.to(card1Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 3.2);
+      }
+      if (copy1Ref.current) {
+        masterTl.to(copy1Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 3.4);
+      }
+      if (navIndicatorRef.current) {
+        masterTl.to(navIndicatorRef.current, { y: 40, ease: 'power2.inOut', duration: 1.0 }, 3.2);
+      }
+
+      // Phase 1: Chapter 1 (4.2 -> 7.4)
+      if (chapter1InputTextRef.current) {
+        masterTl.to(
+          chapter1InputTextRef.current,
+          { maxWidth: '100%', ease: 'none', duration: 1.8 },
+          4.4
+        );
+      }
+      if (chapter1SentPillRef.current) {
+        masterTl.to(
+          chapter1SentPillRef.current,
+          { opacity: 1, y: 0, scale: 1, ease: 'back.out(1.2)', duration: 0.6 },
+          6.2
+        );
+      }
+      if (chapter1IllusRef.current) {
+        masterTl.to(
+          chapter1IllusRef.current,
+          { opacity: 0.15, scale: 0.92, y: -8, ease: 'power2.out', duration: 0.6 },
+          6.2
+        );
+      }
+      if (chapter1CursorRef.current) {
+        masterTl.to(chapter1CursorRef.current, { opacity: 0, duration: 0.2 }, 6.2);
+      }
+
+      // Transition 1 -> 2 (7.4 -> 8.4)
+      if (card1Ref.current) {
+        masterTl.to(card1Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 7.4);
+      }
+      if (copy1Ref.current) {
+        masterTl.to(copy1Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 7.4);
+      }
+      if (card2Ref.current) {
+        masterTl.to(card2Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 7.4);
+      }
+      if (copy2Ref.current) {
+        masterTl.to(copy2Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 7.6);
+      }
+      if (navIndicatorRef.current) {
+        masterTl.to(navIndicatorRef.current, { y: 80, ease: 'power2.inOut', duration: 1.0 }, 7.4);
+      }
+
+      // Phase 2: Chapter 2 (8.4 -> 11.6)
+      if (card2Ref.current) {
+        masterTl.to(card2Ref.current, { scale: 1.02, ease: 'power1.inOut', duration: 3.2 }, 8.4);
+      }
+
+      // Transition 2 -> 3 (11.6 -> 12.6)
+      if (card2Ref.current) {
+        masterTl.to(card2Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 11.6);
+      }
+      if (copy2Ref.current) {
+        masterTl.to(copy2Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 11.6);
+      }
+      if (card3Ref.current) {
+        masterTl.to(card3Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 11.6);
+      }
+      if (copy3Ref.current) {
+        masterTl.to(copy3Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 11.8);
+      }
+      if (navIndicatorRef.current) {
+        masterTl.to(navIndicatorRef.current, { y: 120, ease: 'power2.inOut', duration: 1.0 }, 11.6);
+      }
+
+      // Phase 3: Chapter 3 (12.6 -> 15.8)
+      if (card3Ref.current) {
+        masterTl.to(card3Ref.current, { scale: 1.02, ease: 'power1.inOut', duration: 3.2 }, 12.6);
+      }
+
+      // Transition 3 -> 4 (15.8 -> 16.8)
+      if (card3Ref.current) {
+        masterTl.to(card3Ref.current, { opacity: 0, scale: 0.96, ease: 'power2.inOut', duration: 1.0 }, 15.8);
+      }
+      if (copy3Ref.current) {
+        masterTl.to(copy3Ref.current, { opacity: 0, y: -16, ease: 'power2.inOut', duration: 0.8 }, 15.8);
+      }
+      if (card4Ref.current) {
+        masterTl.to(card4Ref.current, { opacity: 1, scale: 1, ease: 'power2.inOut', duration: 1.0 }, 15.8);
+      }
+      if (copy4Ref.current) {
+        masterTl.to(copy4Ref.current, { opacity: 1, y: 0, ease: 'power2.inOut', duration: 0.8 }, 16.0);
+      }
+      if (navIndicatorRef.current) {
+        masterTl.to(navIndicatorRef.current, { y: 160, ease: 'power2.inOut', duration: 1.0 }, 15.8);
+      }
+
+      // Phase 4: Chapter 4 (16.8 -> 20.0)
+      if (mcpPromptTextRef.current) {
+        masterTl.to(
+          mcpPromptTextRef.current,
+          { maxWidth: '100%', ease: 'none', duration: 2.0 },
+          17.0
+        );
+      }
     });
 
     return () => {
@@ -386,7 +616,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
     }
     const trackTop = track.getBoundingClientRect().top + window.scrollY;
     const scrollable = Math.max(0, track.offsetHeight - window.innerHeight);
-    const targets = [0.06, 0.32, 0.52, 0.72, 0.92];
+    const targets = [0.08, 0.28, 0.50, 0.72, 0.92];
     const targetY = trackTop + scrollable * (targets[chapterIndex] ?? 0);
     activeChapterRef.current = chapterIndex;
     setActiveChapter(chapterIndex);
@@ -510,7 +740,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Right: 3-Layer Fanned Reminder / Capture Card */}
-            <div className="md:col-span-5 flex justify-center md:justify-end pb-1">
+            <div ref={heroCardRef} className="md:col-span-5 flex justify-center md:justify-end pb-1">
               <button
                 type="button"
                 onClick={() => setHeroScenarioIdx((prev) => (prev + 1) % HERO_SCENARIOS.length)}
@@ -598,7 +828,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
           {/* Desktop Stage — exact match to reference composition */}
           <div className="hidden lg:flex items-center justify-center relative min-h-[46rem] xl:min-h-[48rem] w-full overflow-hidden">
             {/* Bubble 1 — Top-Right Foreground */}
-            <div data-bubble-fg className="absolute top-[15.5%] left-[57%] z-20">
+            <div data-bubble-fg data-bubble-right className="absolute top-[15.5%] left-[57%] z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#e8b354] mb-1.5">
                 Nathalie
               </div>
@@ -608,7 +838,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 2 — Upper-Left Recessed (behind "W" of headline) */}
-            <div data-bubble-bg className="absolute top-[29%] left-[17.2%] z-10">
+            <div data-bubble-bg data-bubble-left className="absolute top-[29%] left-[17.2%] z-10">
               <div className="text-[0.68rem] font-medium leading-none text-[#ffffeb]/25 mb-1.5">
                 Stephen
               </div>
@@ -618,7 +848,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 3 — Far-Left Edge Bleed */}
-            <div data-bubble-fg className="absolute top-[45%] -left-2.5 z-20">
+            <div data-bubble-fg data-bubble-left className="absolute top-[45%] -left-2.5 z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#e8b354] pl-1 mb-1.5">
                 Nathalie
               </div>
@@ -628,7 +858,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 4 — Far-Right Foreground */}
-            <div data-bubble-fg className="absolute top-[38.5%] right-[3.7%] z-20">
+            <div data-bubble-fg data-bubble-right className="absolute top-[38.5%] right-[3.7%] z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#d96b6b] mb-1.5">
                 Stephen
               </div>
@@ -649,7 +879,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </h2>
 
             {/* Bubble 5 — Lower-Left Foreground */}
-            <div data-bubble-fg className="absolute top-[69%] left-[29%] z-20">
+            <div data-bubble-fg data-bubble-left className="absolute top-[69%] left-[29%] z-20">
               <div className="text-[0.68rem] font-medium leading-none text-[#8ec5e8] mb-1.5">
                 Mikel
               </div>
@@ -659,7 +889,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
             </div>
 
             {/* Bubble 6 — Lower-Right Recessed */}
-            <div data-bubble-bg className="absolute top-[62.5%] left-[56.8%] z-10">
+            <div data-bubble-bg data-bubble-right className="absolute top-[62.5%] left-[56.8%] z-10">
               <div className="text-[0.68rem] font-medium leading-none text-[#ffffeb]/25 mb-1.5">
                 Stephen
               </div>
@@ -754,7 +984,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
         </div>
 
         {/* Desktop Scroll-Choreographed Sticky 3-Column Feature Walkthrough */}
-        <div ref={walkthroughTrackRef} className="hidden lg:block relative z-30 h-[440vh]">
+        <div ref={walkthroughTrackRef} className="hidden lg:block relative z-30 h-[480vh]">
           <div className="sticky top-0 h-screen overflow-hidden flex items-center">
             {/* Subtle Background Diagonal Cream Ribbon Motif (visible across walkthrough stage) */}
             <svg
@@ -765,6 +995,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
               preserveAspectRatio="none"
             >
               <path
+                ref={backgroundWaveRef}
                 d="M-120 440 C 260 440, 390 190, 740 190 C 1090 190, 1210 470, 1560 430"
                 stroke="#f2f0de"
                 strokeWidth="44"
@@ -774,37 +1005,43 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
 
             <div className="max-w-[78rem] mx-auto px-8 w-full grid grid-cols-12 items-center gap-6 relative z-10">
               {/* Left Column: 5-Chapter Vertical Navigation (terracotta active accent) */}
-              <div ref={leftNavRef} className="col-span-3 flex flex-col items-start space-y-2.5">
-                {(
-                  [
-                    'The details',
-                    'Ask anything',
-                    'What did I miss?',
-                    'Summary',
-                    'MCP',
-                  ] as const
-                ).map((label, idx) => {
-                  const isActive = activeChapter === idx;
-                  return (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => scrollToChapter(idx)}
-                      className={`group flex items-center text-left text-[1.25rem] leading-[1.6] tracking-[-0.015em] transition-all duration-200 cursor-pointer ${
-                        isActive
-                          ? 'text-[#1a1a1a] font-medium'
-                          : 'text-[#1a1a1a]/35 hover:text-[#1a1a1a]/70 font-normal'
-                      }`}
-                    >
-                      <span
-                        className={`w-[3px] rounded-full mr-3 transition-all duration-200 ${
-                          isActive ? 'h-5 bg-[#d84f32] opacity-100' : 'h-0 bg-transparent opacity-0'
+              <div ref={leftNavRef} className="col-span-3 relative flex flex-col items-start">
+                {/* Single terracotta indicator pill that smoothly slides along the active chapter */}
+                <div
+                  ref={navIndicatorRef}
+                  className="absolute left-0 w-[3px] h-5 bg-[#d84f32] rounded-full pointer-events-none"
+                  style={{
+                    transform: `translateY(${activeChapter * 40}px)`,
+                    transition: 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1)',
+                  }}
+                />
+                <div className="space-y-2.5 pl-3.5">
+                  {(
+                    [
+                      'The details',
+                      'Ask anything',
+                      'What did I miss?',
+                      'Summary',
+                      'MCP',
+                    ] as const
+                  ).map((label, idx) => {
+                    const isActive = activeChapter === idx;
+                    return (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => scrollToChapter(idx)}
+                        className={`block text-left text-[1.2rem] xl:text-[1.25rem] leading-[1.5] tracking-[-0.015em] transition-colors duration-200 cursor-pointer ${
+                          isActive
+                            ? 'text-[#1a1a1a] font-medium'
+                            : 'text-[#1a1a1a]/35 hover:text-[#1a1a1a]/70 font-normal'
                         }`}
-                      />
-                      <span>{label}</span>
-                    </button>
-                  );
-                })}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Center Column: Uniform 27.5rem/29.5rem Square Morphing Stage */}
@@ -813,17 +1050,17 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                   ref={floatingCardRef}
                   className="w-[27.5rem] h-[27.5rem] xl:w-[29.5rem] xl:h-[29.5rem] relative"
                 >
-                  {/* Chapter 0: Cream-Beige Live Transcript Card (kept mounted to preserve GSAP feed scroll) */}
+                  {/* Chapter 0: Cream-Beige Live Transcript Card */}
                   <div
-                    className={`relative rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] px-6 pt-6 pb-4 w-full h-full flex flex-col justify-between transition-all duration-300 ${
-                      activeChapter === 0
-                        ? 'opacity-100 scale-100 pointer-events-auto'
-                        : 'opacity-0 scale-[0.97] pointer-events-none absolute inset-0'
+                    ref={card0Ref}
+                    className={`absolute inset-0 rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] px-6 pt-6 pb-4 w-full h-full flex flex-col justify-between ${
+                      activeChapter === 0 ? 'pointer-events-auto' : 'pointer-events-none'
                     }`}
                     aria-hidden={activeChapter !== 0}
                   >
                     {/* Floating Portrait 1: Top-Right (Mikel) */}
                     <button
+                      ref={mikelAvatarRef}
                       type="button"
                       onClick={() =>
                         setHighlightedSpeaker((prev) =>
@@ -845,6 +1082,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
 
                     {/* Floating Portrait 2: Mid-Right (Stephen) */}
                     <button
+                      ref={stephenAvatarRef}
                       type="button"
                       onClick={() =>
                         setHighlightedSpeaker((prev) => (prev === 'stephen' ? null : 'stephen'))
@@ -939,273 +1177,232 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
                     </div>
                   </div>
 
-                  {activeChapter !== 0 && (
-                    <AnimatePresence mode="wait">
-                      {activeChapter === 1 && (
-                        /* Chapter 1: Ask anything — Spot Illustration + Typing Prompt -> Sent Pill */
-                        <motion.div
-                          key="chapter-ask"
-                          initial={{ opacity: 0, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                          transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] p-6 flex flex-col justify-between relative overflow-hidden text-left"
+                  {/* Chapter 1: Ask anything — Spot Illustration + Typing Prompt -> Sent Pill */}
+                  <div
+                    ref={card1Ref}
+                    className={`absolute inset-0 rounded-[1.5rem] bg-[#dedbca] border border-[#1a1a1a]/[0.06] shadow-[0_24px_60px_-18px_rgba(26,26,26,0.14)] p-6 flex flex-col justify-between overflow-hidden text-left ${
+                      activeChapter === 1 ? 'pointer-events-auto' : 'pointer-events-none'
+                    }`}
+                    aria-hidden={activeChapter !== 1}
+                  >
+                    {/* Top: Sent Question Pill */}
+                    <div className="min-h-[2.5rem] flex flex-col items-end gap-2 z-10 w-full">
+                      <div
+                        ref={chapter1SentPillRef}
+                        className="rounded-full bg-[#1a1a1a] text-[#ffffeb] px-4 py-2 text-xs font-medium shadow-md self-end"
+                      >
+                        {window1AnswerNote ? 'Your question' : "What's blocking the launch this week?"}
+                      </div>
+                    </div>
+
+                    {/* Center Spot Illustration */}
+                    <div
+                      ref={chapter1IllusRef}
+                      className="flex flex-col items-center justify-center text-center my-auto transition-transform duration-300"
+                    >
+                      <img
+                        src={askAnythingIllus}
+                        alt="Ask anything about your meetings"
+                        className="w-24 h-20 object-contain mb-3 drop-shadow-xs"
+                      />
+                      <p className="font-display text-[1.25rem] leading-[1.18] text-[#1a1a1a]">
+                        Ask anything about
+                        <br />
+                        <em className="italic font-normal">your meetings</em>
+                      </p>
+                    </div>
+
+                    {/* Bottom Prompt Composer with Typing Simulation */}
+                    <form
+                      onSubmit={handleWindow1Ask}
+                      className="rounded-full bg-[#ffffff] border border-[#1a1a1a]/10 px-5 py-3 flex items-center justify-between shadow-xs z-10 w-full"
+                    >
+                      <div className="flex-1 flex items-center overflow-hidden min-h-[1.25rem]">
+                        <span
+                          ref={chapter1InputTextRef}
+                          className="inline-block whitespace-nowrap overflow-hidden text-xs text-[#1a1a1a]"
                         >
-                          {(() => {
-                            const fullQ = "What's blocking the launch this week?";
-                            const sent = askDemoTick >= 36 || Boolean(window1AnswerNote);
-                            const typed = fullQ.slice(0, Math.min(fullQ.length, askDemoTick));
-                            return (
-                              <>
-                                {/* Top: Sent Question Pill */}
-                                <div className="min-h-[2.5rem] flex flex-col items-end gap-2 z-10 w-full">
-                                  {sent && (
-                                    <motion.div
-                                      initial={{ opacity: 0, y: 14, scale: 0.95 }}
-                                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                                      className="rounded-full bg-[#1a1a1a] text-[#ffffeb] px-4 py-2 text-xs font-medium shadow-md self-end"
-                                    >
-                                      {window1AnswerNote ? 'Your question' : fullQ}
-                                    </motion.div>
-                                  )}
-                                </div>
+                          What&apos;s blocking the launch this week?
+                        </span>
+                        <span
+                          ref={chapter1CursorRef}
+                          className="inline-block w-0.5 h-3.5 bg-[#1a1a1a] ml-0.5 animate-pulse shrink-0"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        aria-label="Send question"
+                        className="w-5 h-5 rounded-full bg-[#1a1a1a]/10 hover:bg-[#1a1a1a] text-[#1a1a1a] hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
+                      >
+                        <ArrowRight className="w-2.5 h-2.5" />
+                      </button>
+                    </form>
+                  </div>
 
-                                {/* Center Spot Illustration (Magnifying Glass + Sprouting Botanical Stem + pink eee) */}
-                                <div
-                                  className={`flex flex-col items-center justify-center text-center transition-all duration-400 my-auto ${
-                                    sent ? 'opacity-15 scale-90 -translate-y-3' : 'opacity-100 scale-100'
-                                  }`}
-                                >
-                                  <img
-                                    src={askAnythingIllus}
-                                    alt="Ask anything about your meetings"
-                                    className="w-24 h-20 object-contain mb-3 drop-shadow-xs"
-                                  />
-                                  <p className="font-display text-[1.25rem] leading-[1.18] text-[#1a1a1a]">
-                                    Ask anything about
-                                    <br />
-                                    <em className="italic font-normal">your meetings</em>
-                                  </p>
-                                </div>
+                  {/* Chapter 2: What did I miss? */}
+                  <div
+                    ref={card2Ref}
+                    className={`absolute inset-0 rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden flex items-center justify-center ${
+                      activeChapter === 2 ? 'pointer-events-auto' : 'pointer-events-none'
+                    }`}
+                    aria-hidden={activeChapter !== 2}
+                  >
+                    <img
+                      src={ipadTranscriptImg}
+                      alt="What did I miss transcript"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-                                {/* Bottom Prompt Composer with Auto-Typing Demo */}
-                                <form
-                                  onSubmit={handleWindow1Ask}
-                                  className="rounded-full bg-[#ffffff] border border-[#1a1a1a]/10 px-5 py-3 flex items-center justify-between shadow-xs z-10 w-full"
-                                >
-                                  <input
-                                    type="text"
-                                    value={
-                                      window1Input ||
-                                      (!sent
-                                        ? typed
-                                        : '')
-                                    }
-                                    onChange={(e) => setWindow1Input(e.target.value)}
-                                    placeholder={sent ? "Ask a follow up about your meetings" : "Ask anything"}
-                                    className="flex-1 bg-transparent text-xs text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:outline-none"
-                                  />
-                                  <button
-                                    type="submit"
-                                    aria-label="Send question"
-                                    className="w-5 h-5 rounded-full bg-[#1a1a1a]/10 hover:bg-[#1a1a1a] text-[#1a1a1a] hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
-                                  >
-                                    <ArrowRight className="w-2.5 h-2.5" />
-                                  </button>
-                                </form>
-                              </>
-                            );
-                          })()}
-                        </motion.div>
-                      )}
+                  {/* Chapter 3: Summary */}
+                  <div
+                    ref={card3Ref}
+                    className={`absolute inset-0 rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden flex items-center justify-center ${
+                      activeChapter === 3 ? 'pointer-events-auto' : 'pointer-events-none'
+                    }`}
+                    aria-hidden={activeChapter !== 3}
+                  >
+                    <img
+                      src={ipadSummaryImg}
+                      alt="Generating Flow Summary"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-                      {activeChapter === 2 && (
-                        /* Chapter 2: What did I miss? — Cozy Atmospheric Backdrop to iPad Transcript View */
-                        <motion.div
-                          key="chapter-missed"
-                          initial={{ opacity: 0, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                          transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden relative flex items-center justify-center"
-                        >
-                          <img
-                            src={ipadTranscriptImg}
-                            alt="What did I miss transcript"
-                            className="w-full h-full object-cover"
+                  {/* Chapter 4: MCP */}
+                  <div
+                    ref={card4Ref}
+                    className={`absolute inset-0 rounded-[1.5rem] bg-[#161616] text-[#ffffeb] p-7 flex flex-col justify-between items-center text-center shadow-2xl overflow-hidden ${
+                      activeChapter === 4 ? 'pointer-events-auto' : 'pointer-events-none'
+                    }`}
+                    aria-hidden={activeChapter !== 4}
+                  >
+                    {/* Claude 8-pointed star / asterisk */}
+                    <div className="pt-1 text-white font-serif text-3xl select-none">
+                      ✹
+                    </div>
+
+                    <div className="w-full space-y-4">
+                      <h4 className="font-sans font-bold text-xl sm:text-2xl text-[#ffffff]">
+                        What should we work on?
+                      </h4>
+
+                      <div className="rounded-2xl bg-[#242424] border border-white/5 p-4 text-left relative min-h-[5.5rem] flex flex-col justify-between">
+                        <div className="text-xs text-[#ffffff]/90 leading-relaxed font-sans overflow-hidden whitespace-nowrap flex items-center">
+                          <span
+                            ref={mcpPromptTextRef}
+                            className="inline-block whitespace-nowrap overflow-hidden"
+                          >
+                            Use the last week of meetings to draft the roadmap
+                          </span>
+                          <span
+                            ref={mcpCursorRef}
+                            className="inline-block w-0.5 h-3 bg-white ml-0.5 animate-pulse shrink-0"
                           />
-                        </motion.div>
-                      )}
+                        </div>
+                        <div className="flex justify-end pt-2">
+                          <button
+                            type="button"
+                            aria-label="Submit"
+                            className="w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                          >
+                            <span className="w-2 h-2 rounded-xs bg-white" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
-                      {activeChapter === 3 && (
-                        /* Chapter 3: Summary — iPad Enhanced Summary View */
-                        <motion.div
-                          key="chapter-summary"
-                          initial={{ opacity: 0, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                          transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] bg-[#141414] shadow-2xl overflow-hidden relative flex items-center justify-center"
-                        >
-                          <img
-                            src={ipadSummaryImg}
-                            alt="Generating Flow Summary"
-                            className="w-full h-full object-cover"
-                          />
-                        </motion.div>
-                      )}
-
-                      {activeChapter === 4 && (
-                        /* Chapter 4: MCP — Solid Obsidian "What should we work on?" Prompt Window */
-                        <motion.div
-                          key="chapter-mcp"
-                          initial={{ opacity: 0, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                          transition={{ duration: 0.28 }}
-                          className="w-full h-full rounded-[1.5rem] bg-[#161616] text-[#ffffeb] p-7 flex flex-col justify-between items-center text-center shadow-2xl"
-                        >
-                          {/* Claude 8-pointed star / asterisk */}
-                          <div className="pt-1 text-white font-serif text-3xl select-none">
-                            ✹
-                          </div>
-
-                          <div className="w-full space-y-4">
-                            <h4 className="font-sans font-bold text-xl sm:text-2xl text-[#ffffff]">
-                              What should we work on?
-                            </h4>
-
-                            {(() => {
-                              const samplePrompt = 'Use the last week of meetings';
-                              const typed = samplePrompt.slice(
-                                0,
-                                Math.min(samplePrompt.length, mcpDemoTick)
-                              );
-                              return (
-                                <div className="rounded-2xl bg-[#242424] border border-white/5 p-4 text-left relative min-h-[5.5rem] flex flex-col justify-between">
-                                  <div className="text-xs text-[#ffffff]/90 leading-relaxed font-sans">
-                                    {typed || (
-                                      <span className="text-[#ffffff]/35">
-                                        Write a message...
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="flex justify-end pt-2">
-                                    <button
-                                      type="button"
-                                      aria-label="Submit"
-                                      className="w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-                                    >
-                                      <span className="w-2 h-2 rounded-xs bg-white" />
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-
-                          {/* Bottom waveform capsule matching video */}
-                          <div className="inline-flex items-center justify-center rounded-full bg-[#242424] border border-white/10 px-4 py-1.5 shadow-md">
-                            <span className="flex items-center gap-1">
-                              <span className="w-0.5 h-2 rounded-full bg-white/80" />
-                              <span className="w-0.5 h-3.5 rounded-full bg-white" />
-                              <span className="w-0.5 h-2 rounded-full bg-white/80" />
-                              <span className="w-0.5 h-1.5 rounded-full bg-white/60" />
-                              <span className="w-0.5 h-3 rounded-full bg-white" />
-                              <span className="w-0.5 h-2 rounded-full bg-white/80" />
-                            </span>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  )}
+                    {/* Bottom waveform capsule matching video */}
+                    <div className="inline-flex items-center justify-center rounded-full bg-[#242424] border border-white/10 px-4 py-1.5 shadow-md">
+                      <span className="flex items-center gap-1">
+                        <span className="w-0.5 h-2 rounded-full bg-white/80" />
+                        <span className="w-0.5 h-3.5 rounded-full bg-white" />
+                        <span className="w-0.5 h-2 rounded-full bg-white/80" />
+                        <span className="w-0.5 h-1.5 rounded-full bg-white/60" />
+                        <span className="w-0.5 h-3 rounded-full bg-white" />
+                        <span className="w-0.5 h-2 rounded-full bg-white/80" />
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Right Column: Active Feature Headline & Editorial Copy */}
-              <div ref={rightCopyRef} className="col-span-3 pl-2 text-left">
-                <AnimatePresence mode="wait">
-                  {activeChapter === 0 && (
-                    <motion.div
-                      key="copy-0"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.24 }}
-                    >
-                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                        Get the details right.
-                      </h3>
-                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                        From uncommon names to industry jargon, Wispr&apos;s notetaking AI uses your dictionary and calendar to help capture the details that matter in your meeting transcript and summary.
-                      </p>
-                    </motion.div>
-                  )}
-                  {activeChapter === 1 && (
-                    <motion.div
-                      key="copy-1"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.24 }}
-                    >
-                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                        Stop digging. <em className="italic font-normal">Just ask.</em>
-                      </h3>
-                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                        Notetaker&apos;s AI searches across your prior meeting notes and the web for the answer, then links you to the source.
-                      </p>
-                    </motion.div>
-                  )}
-                  {activeChapter === 2 && (
-                    <motion.div
-                      key="copy-2"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.24 }}
-                    >
-                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                        Zoned out? <em className="italic font-normal">Catch up</em> in seconds.
-                      </h3>
-                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                        No more &quot;sorry, can you repeat that?&quot; Tap &quot;What did I miss?&quot; and Notetaker gives you a summary of the last few minutes. You&apos;re caught up before anyone notices.
-                      </p>
-                    </motion.div>
-                  )}
-                  {activeChapter === 3 && (
-                    <motion.div
-                      key="copy-3"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.24 }}
-                    >
-                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                        Get a summary <em className="italic font-normal">you&apos;ll actually read.</em>
-                      </h3>
-                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                        Our AI notetaker pulls out timelines, decisions, and next steps, then organizes everything by topic so you can find what matters.
-                      </p>
-                    </motion.div>
-                  )}
-                  {activeChapter === 4 && (
-                    <motion.div
-                      key="copy-4"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.24 }}
-                    >
-                      <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
-                        Connect to all your AI tools.
-                      </h3>
-                      <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
-                        Bring your meeting history into Claude, ChatGPT, Gemini, or any tool that supports MCP. Put your meeting notes to work alongside your docs and projects. No copy-paste required.
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              <div ref={rightCopyRef} className="col-span-3 pl-2 text-left relative min-h-[14rem]">
+                {/* Chapter 0 Copy */}
+                <div
+                  ref={copy0Ref}
+                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
+                    activeChapter === 0 ? 'pointer-events-auto' : 'pointer-events-none'
+                  }`}
+                >
+                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                    Get the details right.
+                  </h3>
+                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                    From uncommon names to industry jargon, Wispr&apos;s notetaking AI uses your dictionary and calendar to help capture the details that matter in your meeting transcript and summary.
+                  </p>
+                </div>
+
+                {/* Chapter 1 Copy */}
+                <div
+                  ref={copy1Ref}
+                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
+                    activeChapter === 1 ? 'pointer-events-auto' : 'pointer-events-none'
+                  }`}
+                >
+                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                    Stop digging. <em className="italic font-normal">Just ask.</em>
+                  </h3>
+                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                    Notetaker&apos;s AI searches across your prior meeting notes and the web for the answer, then links you to the source.
+                  </p>
+                </div>
+
+                {/* Chapter 2 Copy */}
+                <div
+                  ref={copy2Ref}
+                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
+                    activeChapter === 2 ? 'pointer-events-auto' : 'pointer-events-none'
+                  }`}
+                >
+                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                    Zoned out? <em className="italic font-normal">Catch up</em> in seconds.
+                  </h3>
+                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                    No more &quot;sorry, can you repeat that?&quot; Tap &quot;What did I miss?&quot; and Notetaker gives you a summary of the last few minutes. You&apos;re caught up before anyone notices.
+                  </p>
+                </div>
+
+                {/* Chapter 3 Copy */}
+                <div
+                  ref={copy3Ref}
+                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
+                    activeChapter === 3 ? 'pointer-events-auto' : 'pointer-events-none'
+                  }`}
+                >
+                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                    Get a summary <em className="italic font-normal">you&apos;ll actually read.</em>
+                  </h3>
+                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                    Our AI notetaker pulls out timelines, decisions, and next steps, then organizes everything by topic so you can find what matters.
+                  </p>
+                </div>
+
+                {/* Chapter 4 Copy */}
+                <div
+                  ref={copy4Ref}
+                  className={`absolute inset-x-0 top-0 transition-opacity duration-200 ${
+                    activeChapter === 4 ? 'pointer-events-auto' : 'pointer-events-none'
+                  }`}
+                >
+                  <h3 className="font-display text-[2.25rem] xl:text-[2.5rem] leading-[1.02] tracking-[-0.02em] mb-3.5">
+                    Connect to all your AI tools.
+                  </h3>
+                  <p className="text-[0.875rem] text-[#1a1a1a]/75 leading-[1.55]">
+                    Bring your meeting history into Claude, ChatGPT, Gemini, or any tool that supports MCP. Put your meeting notes to work alongside your docs and projects. No copy-paste required.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -1908,7 +2105,6 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Fixed Floating Privacy / Access Button at Bottom Left matching video */}
       <div className="fixed bottom-6 left-6 z-50 pointer-events-auto">
         <button
           type="button"

@@ -356,7 +356,7 @@ export const NotetakerTestimonials: React.FC = () => {
       <div
         ref={desktopWrapRef}
         data-slider="wrap"
-        className="hidden lg:block relative w-full h-[380vh]"
+        className="hidden lg:block relative w-full h-[450vh]"
       >
         <div
           ref={desktopTrackRef}
