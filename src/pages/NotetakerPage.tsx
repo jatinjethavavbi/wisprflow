@@ -2207,60 +2207,88 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       <NotetakerTestimonials />
 
       {/* 9. Notetaker FAQ Accordion */}
-      <section className="py-16 sm:py-24 bg-[#ffffeb]">
+       <section className="py-16 sm:py-24 bg-[#ffffeb]">
         <Container>
           <div className="text-center mb-10 sm:mb-12">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-3">
+            <p className="text-[0.68rem] sm:text-xs font-medium uppercase tracking-[0.14em] text-[#1a1a1a]/55 mb-3">
               FAQS
             </p>
-            <h2 className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.02em]">
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-[4rem] leading-[0.98] tracking-[-0.025em]">
               You might <em className="italic font-normal">be wondering.</em>
             </h2>
           </div>
 
-          <div className="max-w-5xl mx-auto rounded-[1.75rem] bg-[#03473e] text-[#ffffeb] p-6 sm:p-10 shadow-xl">
-            <h3 className="font-display text-2xl sm:text-[1.75rem] mb-6">Questions</h3>
-            <div className="divide-y divide-[#ffffeb]/12">
-              {NOTETAKER_FAQS.map((faq) => {
-                const isOpen = openFaqId === faq.id;
-                return (
-                  <div key={faq.id}>
-                    <button
-                      type="button"
-                      aria-expanded={isOpen}
-                      onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
-                      className="w-full py-4 flex items-center justify-between gap-4 text-left cursor-pointer group"
-                    >
-                      <span className="text-xs sm:text-sm font-medium text-[#ffffeb]/95 group-hover:text-[#ffffeb]">
-                        {faq.question}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 shrink-0 text-[#ffffeb]/75 transition-transform duration-200 ${
-                          isOpen ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </button>
+          {(() => {
+            const activeFaq =
+              NOTETAKER_FAQS.find((f) => f.id === openFaqId) || NOTETAKER_FAQS[0];
+            return (
+              <div className="max-w-[54rem] mx-auto rounded-[1.5rem] sm:rounded-[1.75rem] bg-[#e2e2d2] p-3 sm:p-3.5 grid md:grid-cols-12 gap-0 shadow-xs">
+                {/* Left Emerald Pane: Scrollable Questions List */}
+                <div className="md:col-span-6 rounded-[1.15rem] bg-[#03473e] text-[#ffffeb] p-6 sm:p-7 h-[27rem] sm:h-[30.5rem] flex flex-col">
+                  <h3 className="font-display text-2xl sm:text-[1.65rem] leading-none mb-4 shrink-0">
+                    Questions
+                  </h3>
 
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.22 }}
-                          className="overflow-hidden"
+                  <div
+                    className="flex-1 overflow-y-auto pr-4 space-y-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#02241f]"
+                    style={{
+                      WebkitMaskImage:
+                        'linear-gradient(to bottom, transparent 0%, #000 8%, #000 94%, transparent 100%)',
+                      maskImage:
+                        'linear-gradient(to bottom, transparent 0%, #000 8%, #000 94%, transparent 100%)',
+                    }}
+                  >
+                    {NOTETAKER_FAQS.map((faq) => {
+                      const isSelected = activeFaq.id === faq.id;
+                      return (
+                        <button
+                          key={faq.id}
+                          type="button"
+                          onClick={() => setOpenFaqId(faq.id)}
+                          aria-pressed={isSelected}
+                          className={`w-full text-left text-[0.78rem] sm:text-[0.83rem] leading-[1.4] py-1 transition-all duration-150 cursor-pointer block ${
+                            isSelected
+                              ? 'text-[#ffffeb] font-semibold'
+                              : 'text-[#ffffeb]/75 hover:text-[#ffffeb] font-medium'
+                          }`}
                         >
-                          <p className="pb-4 text-xs sm:text-sm text-[#ffffeb]/75 leading-relaxed max-w-3xl">
-                            {faq.answer}
-                          </p>
-                        </motion.div>
-                      )}
+                          {faq.question}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Right Warm Stone Pane: Active Answer Bubble + Flow Mark */}
+                <div className="md:col-span-6 p-6 sm:p-7 h-[27rem] sm:h-[30.5rem] flex flex-col">
+                  <h3 className="font-display text-2xl sm:text-[1.65rem] leading-none text-[#1a1a1a] mb-4 shrink-0">
+                    Answer
+                  </h3>
+
+                  <div className="flex-1 overflow-y-auto pr-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#c2c2b0]">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeFaq.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.22 }}
+                      >
+                        <div className="rounded-[1rem] bg-[#f4f4ea] p-5 sm:p-6 text-[0.78rem] sm:text-[0.83rem] text-[#1a1a1a]/85 leading-[1.58] space-y-3.5 shadow-[0_1px_4px_rgba(26,26,26,0.04)]">
+                          {activeFaq.answer.split('\n\n').map((para, pIdx) => (
+                            <p key={pIdx}>{para}</p>
+                          ))}
+                        </div>
+                        <div className="mt-3 w-7 h-7 rounded-full bg-[#03473e] text-[#ffffeb] flex items-center justify-center shadow-xs">
+                          <FlowWaveformMark className="w-3.5 h-3" />
+                        </div>
+                      </motion.div>
                     </AnimatePresence>
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                </div>
+              </div>
+            );
+          })()}
         </Container>
       </section>
 
