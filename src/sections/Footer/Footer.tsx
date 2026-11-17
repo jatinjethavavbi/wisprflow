@@ -1,22 +1,24 @@
 import React, { useEffect, useRef } from 'react';
 import { Container } from '../../components/Container';
 import { AppLink, useRouter } from '../../context/RouterContext';
-import { FOOTER_COLUMNS, LEGAL_LINKS } from '../../data/footer';
+import { FOOTER_COLUMNS } from '../../data/footer';
 import { gsap, useScrollReveal } from '../../hooks/useGsapAnimations';
+import flowbarGraphic from '../../assets/images/flowbar_graphic.svg';
+import transcriptNewGraphic from '../../assets/images/transcript_new_graphic.png';
 
 interface FooterProps {
   onOpenDownload?: (mode: 'dictation' | 'notetaker') => void;
 }
 
 const WAVE_BARS = [
-  { x: 0, y: 12, height: 330 },
-  { x: 82, y: 152, height: 154 },
-  { x: 164, y: 66, height: 216 },
-  { x: 246, y: 152, height: 154 },
-  { x: 328, y: 12, height: 330 },
+  { x: 0, y: 10, width: 44, height: 300, rx: 22 },
+  { x: 70, y: 170, width: 44, height: 140, rx: 22 },
+  { x: 140, y: 110, width: 44, height: 200, rx: 22 },
+  { x: 210, y: 170, width: 44, height: 140, rx: 22 },
+  { x: 280, y: 10, width: 44, height: 300, rx: 22 },
 ];
 
-export const Footer: React.FC<FooterProps> = () => {
+export const Footer: React.FC<FooterProps> = ({ onOpenDownload }) => {
   const colsRef = useRef<HTMLDivElement>(null);
   const wordmarkRef = useRef<HTMLDivElement>(null);
   const barsRef = useRef<Array<SVGRectElement | null>>([]);
@@ -35,7 +37,7 @@ export const Footer: React.FC<FooterProps> = () => {
     start: 'top 94%',
   });
 
-  // One-time entrance wave animation across the 5 giant footer bars (plays once only)
+  // Wave entrance animation across the 5 giant footer bars
   useEffect(() => {
     const rects = barsRef.current.filter((el): el is SVGRectElement => el !== null);
     if (rects.length === 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -43,7 +45,7 @@ export const Footer: React.FC<FooterProps> = () => {
     }
 
     const ctx = gsap.context(() => {
-      gsap.set(rects, { transformOrigin: '50% 50%', scaleY: 0.18, opacity: 0 });
+      gsap.set(rects, { transformOrigin: '50% 100%', scaleY: 0.18, opacity: 0 });
       gsap.to(rects, {
         scaleY: 1,
         opacity: 1,
@@ -73,16 +75,101 @@ export const Footer: React.FC<FooterProps> = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const primaryLegal = LEGAL_LINKS.slice(0, 3);
-  const secondaryLegal = LEGAL_LINKS.slice(3);
-
   return (
-    <footer className="bg-[#ffffeb] text-[#1a1a1a] pt-10 sm:pt-16 pb-10 sm:pb-12">
+    <footer className="bg-[#FFFFEB] text-[#1a1a1a] pt-12 sm:pt-16 pb-10 sm:pb-14 border-t border-[#1a1a1a]/10">
       <Container maxWidth="wide">
-        {/* 4-Column Footer Navigation Links */}
+        {/* 1. Products Section */}
+        <div className="mb-16 sm:mb-20">
+          <div className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] text-[#787D6D] font-semibold mb-4 px-1">
+            PRODUCTS
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
+            {/* Product 1: Wispr Flow Dictation */}
+            <div
+              onClick={() => {
+                if (onOpenDownload) {
+                  onOpenDownload('dictation');
+                } else {
+                  navigate('/get-started');
+                }
+              }}
+              className="group relative flex items-center gap-4 sm:gap-6 bg-[#DDD8CB] border-2 hover:border-[#1a1a1a] rounded-[20px] sm:rounded-[22px] p-2.5 sm:p-3 pr-6 sm:pr-8 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
+            >
+              {/* Graphic Box */}
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-[16px] sm:rounded-[18px] bg-[#EBDDFF] flex items-center justify-center shrink-0 p-3 shadow-inner">
+                <img
+                  src={flowbarGraphic}
+                  alt="Wispr Flowbar"
+                  className="max-w-[7.5rem] sm:max-w-[8.25rem] w-full object-contain"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col justify-center py-1 flex-1">
+                <h3 className="font-body font-semibold text-base sm:text-lg text-[#141414] mb-1.5">
+                  Wispr Flow Dictation
+                </h3>
+                <p className="text-xs sm:text-[13px] text-[#141414]/70 leading-relaxed mb-3.5 max-w-xs sm:max-w-sm">
+                  The voice-to-text AI that turns speech into clear, polished writing in every app.
+                </p>
+                <div className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-[#141414] group-hover:text-black transition-colors">
+                  <span>Download free</span>
+                  <span className="inline-block transition-transform duration-200 group-hover:translate-x-1 font-bold">
+                    &gt;
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Product 2: Wispr Flow Notetaker */}
+            <div
+              onClick={() => {
+                if (onOpenDownload) {
+                  onOpenDownload('notetaker');
+                } else {
+                  navigate('/notetaker');
+                }
+              }}
+              className="group relative flex items-center gap-4 sm:gap-6 bg-[#DDD8CB] border-2 border-transparent hover:border-[#1a1a1a] rounded-[20px] sm:rounded-[22px] p-2.5 sm:p-3 pr-6 sm:pr-8 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
+            >
+              {/* Graphic Box */}
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-[16px] sm:rounded-[18px] bg-[#06443B] flex items-end justify-center shrink-0 overflow-hidden shadow-inner pt-2">
+                <img
+                  src={transcriptNewGraphic}
+                  alt="Wispr Flow Transcript"
+                  className="max-w-[6.75rem] sm:max-w-[7.5rem] w-full object-contain translate-y-1"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col justify-center py-1 flex-1">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <h3 className="font-body font-semibold text-base sm:text-lg text-[#141414]">
+                    Wispr Flow Notetaker
+                  </h3>
+                  <span className="bg-[#F89C33] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs shrink-0 tracking-tight">
+                    New
+                  </span>
+                </div>
+                <p className="text-xs sm:text-[13px] text-[#141414]/70 leading-relaxed mb-3.5 max-w-xs sm:max-w-sm">
+                  AI meeting notes accurate enough to act on. Works in all meetings.
+                </p>
+                <div className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-[#141414] group-hover:text-black transition-colors">
+                  <span>Download free</span>
+                  <span className="inline-block transition-transform duration-200 group-hover:translate-x-1 font-bold">
+                    &gt;
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. 4-Column Footer Navigation Links */}
         <div
           ref={colsRef}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 pb-12 sm:pb-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 pb-14 sm:pb-20"
         >
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} data-footer-col>
@@ -96,11 +183,7 @@ export const Footer: React.FC<FooterProps> = () => {
                     <li key={link.label}>
                       <AppLink
                         to={link.href}
-                        className={`group inline-flex items-center gap-1.5 text-[13px] sm:text-[14px] font-normal transition-all duration-200 ${
-                          isPricing
-                            ? 'text-[#008272] hover:text-[#065B50] font-medium'
-                            : 'text-[#1A1A1A]/85 hover:text-[#034F46] hover:translate-x-0.5'
-                        }`}
+                        className="group inline-flex items-center gap-1.5 text-[13px] sm:text-[14px] text-[#1A1A1A] hover:text-[#034F46] hover:translate-x-0.5 transition-all duration-150"
                       >
                         <span>{link.label}</span>
                         {isPricing && (
@@ -117,8 +200,8 @@ export const Footer: React.FC<FooterProps> = () => {
           ))}
         </div>
 
-        {/* Full-Width Giant Interactive Brand Wordmark (|ılı| Flow) */}
-        <div ref={wordmarkRef} className="py-4 sm:py-8 overflow-hidden">
+        {/* 3. Full-Width Giant Brand Wordmark (|ılı| Flow) */}
+        <div ref={wordmarkRef} className="py-6 sm:py-10 overflow-hidden">
           <button
             type="button"
             onClick={handleBrandClick}
@@ -126,72 +209,96 @@ export const Footer: React.FC<FooterProps> = () => {
             className="w-full block text-[#1a1a1a] cursor-pointer focus:outline-none group"
           >
             <svg
-              viewBox="0 0 1260 354"
+              viewBox="0 0 1280 320"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="w-full h-auto block select-none transition-opacity duration-200 group-hover:opacity-90"
               aria-hidden="true"
             >
+              {/* 5 Vertical Waveform Bars */}
               {WAVE_BARS.map((bar, idx) => (
                 <rect
-                  key={bar.x}
+                  key={idx}
                   ref={(el) => {
                     barsRef.current[idx] = el;
                   }}
                   x={bar.x}
                   y={bar.y}
-                  width="50"
+                  width={bar.width}
                   height={bar.height}
-                  rx="25"
+                  rx={bar.rx}
                   fill="currentColor"
                 />
               ))}
 
-              <text
-                x="518"
-                y="298"
-                fill="currentColor"
-                style={{
-                  fontFamily: 'Figtree, sans-serif',
-                  fontWeight: 700,
-                  fontSize: '335px',
-                  letterSpacing: '-12px',
-                }}
-              >
-                Flow
-              </text>
+              {/* Vector Wordmark "Flow" perfectly aligned */}
+              <g transform="translate(414, 10) scale(3.15)">
+                {/* F */}
+                <path
+                  d="M59.13 57.15H20.53V93.77H0V0H59.68V19.01H20.52V38.65H59.12V57.15H59.13Z"
+                  fill="currentColor"
+                />
+                {/* l */}
+                <path
+                  d="M98.1 76.54H89.15C87.4 76.54 85.98 75.12 85.98 73.37V0H66.47V81.6C66.47 88.32 71.92 93.77 78.64 93.77H85.99H98.11V76.54H98.1Z"
+                  fill="currentColor"
+                />
+                {/* o */}
+                <path
+                  d="M101.51 61.0299C101.51 40.4399 116.62 26.6299 137.47 26.6299C158.32 26.6299 173.3 40.4399 173.3 61.0299C173.3 81.6199 158.19 95.3 137.47 95.3C116.75 95.3 101.51 81.6199 101.51 61.0299ZM121.7 60.8999C121.7 70.7999 128.08 77.3199 137.47 77.3199C146.86 77.3199 153.11 70.8099 153.11 60.8999C153.11 50.9899 146.73 44.6099 137.47 44.6099C128.21 44.6099 121.7 51.1199 121.7 60.8999Z"
+                  fill="currentColor"
+                />
+                {/* w */}
+                <path
+                  d="M192.109 93.35L171.66 28.3501H192.235L198.075 49.5384C199.602 55.1299 200.995 61.5033 202.01 67.9954C203.151 61.1074 203.789 58.6333 206.583 49.5384L213.061 28.3501H233.123L239.089 49.5384C239.727 51.7453 242.773 63.8388 243.411 67.9954C244.175 63.3143 247.22 51.874 247.858 49.5384L253.959 28.3501H274.66L252.432 93.35H234.274L228.173 72.6764C225.002 62.0179 223.348 54.3481 222.962 51.6167C222.449 54.3481 221.308 59.4151 217.248 73.0623L211.156 93.34H192.109V93.35Z"
+                  fill="currentColor"
+                />
+              </g>
             </svg>
           </button>
         </div>
 
-        {/* Bottom Copyright, Two-Line Legal Links, and 5 Social Icons */}
-        <div className="pt-8 sm:pt-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-          <div className="text-[13px]">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 font-medium text-[#1a1a1a]">
-              <span>© Wispr Flow {new Date().getFullYear()}</span>
-              {primaryLegal.map((item) => (
-                <AppLink
-                  key={item.label}
-                  to={item.href}
-                  className="hover:text-[#034f46] transition-colors"
-                >
-                  {item.label}
-                </AppLink>
-              ))}
+        {/* 4. Bottom Legal & Social Bar */}
+        <div className="pt-8 sm:pt-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 text-[#1a1a1a]">
+          <div className="text-[13px] leading-relaxed">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 font-medium">
+              <span>© Wispr Flow 2026</span>
+              <AppLink
+                to="/terms-of-service"
+                className="hover:text-[#034f46] transition-colors"
+              >
+                Terms
+              </AppLink>
+              <AppLink
+                to="/privacy-policy"
+                className="hover:text-[#034f46] transition-colors"
+              >
+                Privacy
+              </AppLink>
+              <AppLink
+                to="/data-controls"
+                className="hover:text-[#034f46] transition-colors"
+              >
+                Data Controls
+              </AppLink>
             </div>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-2 font-normal text-[#1a1a1a]/60">
-              {secondaryLegal.map((item) => (
-                <AppLink
-                  key={item.label}
-                  to={item.href}
-                  className="hover:text-[#1a1a1a] transition-colors"
-                >
-                  {item.label}
-                </AppLink>
-              ))}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-2 text-[#1a1a1a]/65">
+              <AppLink
+                to="/data-controls"
+                className="hover:text-[#1a1a1a] transition-colors"
+              >
+                Do Not Sell or Share My Personal Information
+              </AppLink>
+              <AppLink
+                to="/privacy"
+                className="hover:text-[#1a1a1a] transition-colors"
+              >
+                Privacy Settings
+              </AppLink>
             </div>
           </div>
 
+          {/* Social Media Icons */}
           <div className="flex items-center gap-4 text-[#1a1a1a] shrink-0">
             {/* YouTube */}
             <AppLink

@@ -62,8 +62,6 @@ import zoomGuideImg from '../assets/images/zoom_nt_guide.png';
 import robSolomonAvatar from '../assets/images/rob_solomon_avatar.png';
 import sammYatesAvatar from '../assets/images/samm_yates_avatar.png';
 import ntCtaBg from '../assets/images/nt_cta_bg.webp';
-import flowbarGraphic from '../assets/images/flowbar_graphic.svg';
-import transcriptNewGraphic from '../assets/images/transcript_new_graphic.png';
 
 interface NotetakerPageProps {
   onOpenDownload: (mode?: 'dictation' | 'notetaker') => void;
@@ -1837,81 +1835,6 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
         </div>
       </section>
 
-      {/* 12. Bottom Products Switcher Strip above Footer */}
-      <section className="pb-16 sm:pb-24 bg-[#EFECE6]">
-        <Container>
-          <div className="max-w-6xl mx-auto">
-            <div className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] text-[#787D6D] font-semibold mb-4 px-1">
-              PRODUCTS
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-              {/* Product 1: Wispr Flow Dictation */}
-              <div
-                onClick={() => onOpenDownload('dictation')}
-                className="group relative flex items-center gap-4 sm:gap-6 bg-[#DDD8CB] border-2 border-[#1a1a1a]/70 hover:border-[#1a1a1a] rounded-[20px] sm:rounded-[22px] p-2.5 sm:p-3 pr-6 sm:pr-8 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
-              >
-                {/* Graphic Box */}
-                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-[16px] sm:rounded-[18px] bg-[#EBDDFF] flex items-center justify-center shrink-0 p-3 shadow-inner">
-                  <img
-                    src={flowbarGraphic}
-                    alt="Wispr Flowbar"
-                    className="max-w-[7.5rem] sm:max-w-[8.25rem] w-full object-contain"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="flex flex-col justify-center py-1 flex-1">
-                  <h3 className="font-body font-semibold text-base sm:text-lg text-[#141414] mb-1.5">
-                    Wispr Flow Dictation
-                  </h3>
-                  <p className="text-xs sm:text-[13px] text-[#141414]/70 leading-relaxed mb-3.5 max-w-xs sm:max-w-sm">
-                    The voice-to-text AI that turns speech into clear, polished writing in every app.
-                  </p>
-                  <div className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-[#141414] group-hover:text-black transition-colors">
-                    <span>Download free</span>
-                    <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Product 2: Wispr Flow Notetaker */}
-              <div
-                onClick={() => onOpenDownload('notetaker')}
-                className="group relative flex items-center gap-4 sm:gap-6 bg-[#DDD8CB] border-2 border-transparent hover:border-[#1a1a1a] rounded-[20px] sm:rounded-[22px] p-2.5 sm:p-3 pr-6 sm:pr-8 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
-              >
-                {/* Graphic Box */}
-                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-[16px] sm:rounded-[18px] bg-[#06443B] flex items-end justify-center shrink-0 overflow-hidden shadow-inner pt-2">
-                  <img
-                    src={transcriptNewGraphic}
-                    alt="Wispr Flow Transcript"
-                    className="max-w-[6.75rem] sm:max-w-[7.5rem] w-full object-contain translate-y-1"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="flex flex-col justify-center py-1 flex-1">
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <h3 className="font-body font-semibold text-base sm:text-lg text-[#141414]">
-                      Wispr Flow Notetaker
-                    </h3>
-                    <span className="bg-[#F89C33] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs shrink-0 tracking-tight">
-                      New
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-[#141414]/70 leading-relaxed mb-3.5 max-w-xs sm:max-w-sm">
-                    AI meeting notes accurate enough to act on. Works in all meetings.
-                  </p>
-                  <div className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-[#141414] group-hover:text-black transition-colors">
-                    <span>Download free</span>
-                    <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
 
       {/* Interactive Guide Reader Modal */}
       <AnimatePresence>
