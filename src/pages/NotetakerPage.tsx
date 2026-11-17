@@ -117,6 +117,7 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
 
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
   const [activeGuide, setActiveGuide] = useState<NotetakerGuideArticle | null>(null);
+  const [hoveredGuideIdx, setHoveredGuideIdx] = useState<number>(1);
 
   // Animation refs
   const heroRef = useRef<HTMLDivElement>(null);
@@ -2293,101 +2294,130 @@ export const NotetakerPage: React.FC<NotetakerPageProps> = ({
       </section>
 
       {/* 10. Editorial Guides ("Level up your note taking.") */}
-      <section id="guides" className="py-16 sm:py-24 bg-[#ffffeb]">
+      <section id="guides" className="py-20 sm:py-24 bg-[#e8e8da]">
         <Container>
-          <div className="text-center mb-10 sm:mb-14">
-            <h2 className="font-display text-4xl sm:text-5xl leading-[0.98] tracking-[-0.02em]">
+          <div className="text-center mb-12 sm:mb-14">
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] leading-[0.98] tracking-[-0.025em] text-[#1a1a1a]">
               Level <em className="italic font-normal">up</em> your note taking.
             </h2>
           </div>
 
-          <div ref={guidesRef} className="max-w-4xl mx-auto space-y-6">
-            {NOTETAKER_GUIDES.map((guide) => {
+          <div
+            ref={guidesRef}
+            onMouseLeave={() => setHoveredGuideIdx(1)}
+            className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch"
+          >
+            {NOTETAKER_GUIDES.map((guide, idx) => {
+              const isHighlighted = hoveredGuideIdx === idx;
               const cardPhoto =
                 guide.variant === 'granola'
-                  ? clayImg
+                  ? atmosphereImg
                   : guide.variant === 'inperson'
                   ? alexImg
-                  : stevenImg;
+                  : clayImg;
               const authorAvatar =
                 guide.variant === 'granola'
                   ? daveImg
                   : guide.variant === 'inperson'
                   ? alexImg
-                  : stevenImg;
+                  : daveImg;
 
               return (
                 <article
                   key={guide.id}
-                  className="rounded-[1.75rem] bg-[#e2e2d2] overflow-hidden border border-[#1a1a1a]/8 shadow-xs transition-transform duration-200 hover:-translate-y-0.5"
+                  onMouseEnter={() => setHoveredGuideIdx(idx)}
+                  className={`rounded-[0.75rem] p-3 transition-colors duration-200 flex flex-col ${
+                    isHighlighted
+                      ? 'bg-[#f6f6ec] shadow-[0_12px_34px_rgba(26,26,26,0.06)]'
+                      : 'bg-transparent hover:bg-[#f6f6ec]/70'
+                  }`}
                 >
                   <button
                     type="button"
                     onClick={() => setActiveGuide(guide)}
-                    className="w-full text-left cursor-pointer block"
+                    className="w-full h-full text-center cursor-pointer flex flex-col justify-between"
                   >
-                    {/* Visual Banner */}
-                    <div className="relative h-56 sm:h-72 overflow-hidden bg-[#1a1a1a]">
-                      <img
-                        src={cardPhoto}
-                        alt={guide.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover opacity-65"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
+                    <div>
+                      {/* Visual Thumbnail */}
+                      <div className="relative h-44 rounded-[0.55rem] overflow-hidden bg-[#1a1a1a] mb-6">
+                        <img
+                          src={cardPhoto}
+                          alt={guide.title}
+                          referrerPolicy="no-referrer"
+                          className={`w-full h-full object-cover ${
+                            guide.variant === 'zoom' ? 'opacity-95' : 'opacity-70'
+                          }`}
+                        />
+                        {guide.variant !== 'zoom' && (
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+                        )}
 
-                      {guide.variant === 'granola' && (
-                        <div className="absolute inset-0 flex items-center justify-center p-6">
-                          <div className="w-full max-w-md rounded-xl bg-[#ffffeb] text-[#1a1a1a] p-5 shadow-2xl">
-                            <div className="font-display text-2xl sm:text-3xl mb-3">
-                              Granola alternatives
-                            </div>
-                            <div className="space-y-2">
-                              <div className="h-2.5 w-3/4 rounded-full bg-[#1a1a1a]/15" />
-                              <div className="h-2.5 w-2/3 rounded-full bg-[#1a1a1a]/12" />
-                              <div className="h-2.5 w-1/2 rounded-full bg-[#1a1a1a]/10" />
+                        {guide.variant === 'granola' && (
+                          <div className="absolute inset-0 flex items-end justify-center px-5 pt-4">
+                            <div className="w-full rounded-t-md bg-[#ffffeb] text-[#1a1a1a] px-4 pt-3.5 pb-4 shadow-2xl text-left">
+                              <div className="font-display text-sm sm:text-[0.95rem] text-center mb-2.5">
+                                Granola alternatives
+                              </div>
+                              <div className="space-y-1.5">
+                                {[
+                                  'w-3/4',
+                                  'w-5/6',
+                                  'w-2/3',
+                                  'w-4/5',
+                                  'w-1/2',
+                                  'w-3/4',
+                                ].map((w, i) => (
+                                  <div key={i} className="flex items-center gap-1.5">
+                                    <span className="w-1 h-1 rounded-full bg-[#1a1a1a]/30 shrink-0" />
+                                    <div className={`h-1.5 ${w} rounded-full bg-[#1a1a1a]/18`} />
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {guide.variant === 'inperson' && (
-                        <div className="absolute inset-0 flex items-center justify-center p-6">
-                          <div className="rounded-xl bg-[#03473e] text-[#ffffeb] px-6 py-4 shadow-2xl border border-[#ffffeb]/15">
-                            <div className="font-display text-2xl sm:text-3xl">
-                              Less note-taking. More listening.
+                        {guide.variant === 'inperson' && (
+                          <div className="absolute inset-0 flex flex-col justify-center px-4">
+                            <div className="rounded-md bg-[#03473e]/95 text-[#ffffeb] px-3.5 py-2.5 shadow-xl border border-[#ffffeb]/15 text-center">
+                              <div className="text-[0.72rem] sm:text-xs font-medium tracking-[-0.01em]">
+                                Less note-taking. More listening.
+                              </div>
                             </div>
-                            <div className="mt-2 w-7 h-7 rounded-md bg-[#ffffeb]/15 flex items-center justify-center">
-                              <FlowWaveformMark className="w-4 h-4 text-[#cef5ca]" />
+                            <div className="mt-2.5 w-6 h-6 rounded-full bg-[#03473e] text-[#ffffeb] flex items-center justify-center shadow-md border border-[#ffffeb]/15">
+                              <FlowWaveformMark className="w-3 h-2.5 text-[#cef5ca]" />
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
 
-                    {/* Clean Typography Body */}
-                    <div className="p-6 sm:p-8 text-center">
-                      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mb-2">
+                      {/* Category Tag */}
+                      <div className="inline-block rounded-[0.25rem] bg-[#dadac9] px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.06em] text-[#1a1a1a]/60 mb-3.5">
                         {guide.category}
                       </div>
-                      <h3 className="font-display text-2xl sm:text-3xl leading-tight mb-5">
+
+                      {/* Article Title */}
+                      <h3 className="font-display text-[1.15rem] sm:text-[1.28rem] leading-[1.16] tracking-[-0.015em] text-[#1a1a1a] px-2 mb-6">
                         {guide.title}
                       </h3>
+                    </div>
 
-                      <div className="flex items-center justify-between text-xs text-[#1a1a1a]/65 pt-2">
-                        <div className="flex items-center gap-2.5">
-                          <img
-                            src={authorAvatar}
-                            alt={guide.author}
-                            referrerPolicy="no-referrer"
-                            className="w-6 h-6 rounded-full object-cover"
-                          />
-                          <span>
-                            {guide.author} · {guide.date}
-                          </span>
-                        </div>
-                        <span className="font-medium tracking-wider uppercase">{guide.readTime}</span>
+                    {/* Footer: Author + Date on Left, Read Time Pill on Right */}
+                    <div className="w-full flex items-center justify-between gap-2 text-[0.66rem] text-[#1a1a1a]/60 pt-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <img
+                          src={authorAvatar}
+                          alt={guide.author}
+                          referrerPolicy="no-referrer"
+                          className="w-5 h-5 rounded-full object-cover shrink-0"
+                        />
+                        <span className="truncate">
+                          {guide.author} · {guide.date}
+                        </span>
                       </div>
+                      <span className="rounded-[0.25rem] bg-[#dadac9]/85 px-2 py-0.5 text-[0.56rem] font-semibold uppercase tracking-[0.06em] text-[#1a1a1a]/55 shrink-0">
+                        {guide.readTime}
+                      </span>
                     </div>
                   </button>
                 </article>
